@@ -5,7 +5,6 @@ using System.Data;
 using System.Drawing;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace mTicketSever
@@ -15,6 +14,17 @@ namespace mTicketSever
         public Form1()
         {
             InitializeComponent();
+            CheckForIllegalCrossThreadCalls = false;
+        }
+
+        private void button1_Click(object sender, EventArgs e)
+        {
+            TcpSever t = new TcpSever();
+            t.Port = 8000;
+            t.callbackList.Add("aaa", new SampleCallback(this));
+            t.StartListen();
+            button1.Enabled = false;
+            
         }
     }
 }
