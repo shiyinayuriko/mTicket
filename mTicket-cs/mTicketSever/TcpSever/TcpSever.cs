@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
@@ -11,61 +10,54 @@ namespace mTicketSever
 {
     class TcpSever
     {
-        private int port;
-        private Socket server;
-        public int Port
-        {
-            get { return port; }
-            set { port = value; }
-        }
+        private Socket _server;
+        public int Port { get; set; }
 
         public void StartListen()
         {
-            ThreadPool.QueueUserWorkItem(new WaitCallback(this.listenProcess), new object());
+            ThreadPool.QueueUserWorkItem(ListenProcess, new object());
         }
-        private void listenProcess(object state)
+        private void ListenProcess(object state)
         {
-            server = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
-            server.Bind(new IPEndPoint(IPAddress.Any, port));
+            _server = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
+            _server.Bind(new IPEndPoint(IPAddress.Any, Port));
             while (true)
             {
-                server.Listen(100);
-                ThreadPool.QueueUserWorkItem(new WaitCallback(this.reciveProcess), server.Accept());
+                _server.Listen(100);
+                ThreadPool.QueueUserWorkItem(ReciveProcess, _server.Accept());
             }
 
         }
-        private void reciveProcess(object p)
+        private void ReciveProcess(object p)
         {
-            Socket client_Con = (Socket)p;
+            var clientCon = (Socket)p;
             try 
             {
-                NetworkStream ns = new NetworkStream(client_Con);
-                StreamReader sr = new StreamReader(ns, Encoding.Default);
-                string str = sr.ReadLine();
-                IPEndPoint EndPoint = (System.Net.IPEndPoint)client_Con.RemoteEndPoint;
+                var ns = new NetworkStream(clientCon);
+                var sr = new StreamReader(ns, Encoding.GetEncoding("UTF-8"));
+                var str = sr.ReadLine();
+                var endPoint = (IPEndPoint)clientCon.RemoteEndPoint;
 
-                string s = reciveCalkBack(str,EndPoint);
+                var s = ReciveCalkBack(str,endPoint);
                 //TODO Encoding
-                client_Con.Send(Encoding.GetEncoding("UTF-8").GetBytes(str+Environment.NewLine));
+                clientCon.Send(Encoding.GetEncoding("UTF-8").GetBytes(s + "\n"));
             }
             catch(Exception e)
             {
                 //TODO
-                throw e;
+                throw;
             }
         }
 
-        public Dictionary<string,ICallback> callbackList = new Dictionary<string,ICallback>();
-        private string reciveCalkBack(string r,IPEndPoint endPoint)
+        public Dictionary<string,ICallback> CallbackList = new Dictionary<string,ICallback>();
+        private string ReciveCalkBack(string r,IPEndPoint endPoint)
         {
-            var keys = callbackList.Keys;
-            string ret = "\0";
+            var keys = CallbackList.Keys;
+            var ret = "\0";
             foreach(var key in keys){
-                if (r.StartsWith(key))
-                {
-                    SocketBackEventArgs e = new SocketBackEventArgs() { ReciveData = r, EndPoint = endPoint };
-                    ret = callbackList[key].dealCommand(e);
-                }
+                if (!r.StartsWith(key)) continue;
+                var e = new SocketBackEventArgs { ReciveData = r, EndPoint = endPoint };
+                ret = CallbackList[key].dealCommand(e);
             }
             return ret;
         }

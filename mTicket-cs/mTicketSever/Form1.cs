@@ -19,9 +19,9 @@ namespace mTicketSever
 
         private void button1_Click(object sender, EventArgs e)
         {
-            TcpSever t = new TcpSever();
-            t.Port = 8000;
-            t.callbackList.Add("aaa", new SampleCallback(this));
+            var t = new TcpSever {Port = 8000};
+            t.CallbackList.Add("aaa", new SampleCallback(this));
+            t.CallbackList.Add("ping", new PingCallback(this));
             t.StartListen();
             button1.Enabled = false;
             

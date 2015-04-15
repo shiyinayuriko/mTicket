@@ -8,18 +8,7 @@ namespace mTicketSever
 {
     public class SocketBackEventArgs : EventArgs
     {
-        private object reciveData;
-        public object ReciveData
-        {
-            get { return reciveData; }
-            set { reciveData = value; }
-        }
-
-        private IPEndPoint endPoint;
-        public IPEndPoint EndPoint
-        {
-            get { return endPoint; }
-            set { endPoint = value; }
-        }
+        public object ReciveData { get; set; }
+        public IPEndPoint EndPoint { get; set; }
     }
 }
