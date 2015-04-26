@@ -55,7 +55,6 @@ public class TCPClient {
 			}
 		}
 	}
-	
 	private class MyThread extends Thread{
 		private String curIp;
 		private static final String PING = "ping -c 1 -w 0.5 ";
@@ -95,7 +94,7 @@ public class TCPClient {
 	private BufferedReader br;
 	private BufferedWriter bw;
 	
-	public void link() throws SocketConnectException{
+	public void connect() throws SocketConnectException{
 		try {
 			socket = new Socket(ip, port);
 			socket.setSoTimeout(50000);

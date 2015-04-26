@@ -1,4 +1,4 @@
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -6,42 +6,80 @@
     android:paddingLeft="@dimen/activity_horizontal_margin"
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
+   	android:orientation="vertical"
     tools:context="net.whitecomet.mticket.MainActivity" >
 
-    <TextView
-        android:id="@+id/textView1"
-        android:layout_width="wrap_content"
+    <LinearLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="@string/hello_world" />
+        >
 
-    <Button
-        android:id="@+id/button1"
-        android:layout_width="wrap_content"
+        <EditText
+            android:id="@+id/editText_ipAddress"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="5"
+            android:hint="@string/ip_address_input_hint" 
+            android:singleLine="true"
+            android:textSize="@dimen/host_info_input_text_size">
+			
+        </EditText>
+
+        <EditText
+            android:id="@+id/editText_port"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="2"
+            android:inputType="number" 
+            android:hint="@string/port_input_hint"
+            android:singleLine="true"            
+			android:textSize="@dimen/host_info_input_text_size"
+		/>
+    </LinearLayout>
+	<LinearLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_alignLeft="@+id/textView1"
-        android:layout_below="@+id/textView1"
-        android:layout_marginTop="32dp"
-        android:text="Button" 
-        android:onClick="search"/>
-
-    <Button
-        android:id="@+id/button2"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignLeft="@+id/button1"
-        android:layout_below="@+id/button1"
-        android:layout_marginTop="58dp"
-        android:text="Button2" 
-        android:onClick="link"/>
-
-    <Button
-        android:id="@+id/button3"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignRight="@+id/button2"
-        android:layout_below="@+id/button2"
-        android:layout_marginTop="61dp"
-        android:text="Button3" 
-        android:onClick="send"/>
-
-</RelativeLayout>
+        >
+		<Button
+		    android:id="@+id/button_search_host"
+		    android:layout_width="0dp"
+		    android:layout_weight="1"
+		    android:layout_height="wrap_content"
+		    android:text="@string/button_search_host" 
+		    android:onClick="searchHost"/>
+		<Button
+		    android:id="@+id/button_connect_host"
+		    android:layout_width="0dp"
+			android:layout_weight="1"
+		    android:layout_height="wrap_content"
+		    android:text="@string/button_connect_host" 
+		    android:onClick="connectHost"/>
+		<Button
+		    android:id="@+id/button_disconnect_host"
+		    android:layout_width="0dp"
+			android:layout_weight="1"
+		    android:layout_height="wrap_content"
+		    android:text="@string/button_disconnect_host" 
+		    android:onClick="disconnectHost"
+		    android:visibility="gone"/>
+	</LinearLayout>
+	
+	<TextView 
+		android:id="@+id/text_states"
+		android:layout_width="match_parent"
+		android:layout_height="wrap_content"
+		android:text="1\n2\n3\n4\n5"
+	/>
+	
+	<ScrollView
+		    android:id="@+id/scrollView1"
+		    android:layout_width="match_parent"
+		    android:layout_height="match_parent" >
+		<TextView
+		    android:id="@+id/text_detail"
+		    android:layout_width="match_parent"
+		    android:layout_height="wrap_content"
+		    android:text="1\n2\n3\n4\n5\n6\n7\n8\n9\n0\n1\n2\n3\n4\n5\n6\n7\n8\n9\n01\n2\n3\n4\n5\n6\n7\n8\n9\n0\n1\n2\n3\n4\n5\n6\n7\n8\n9\n01\n2\n3\n4\n5\n6\n7\n8\n9\n0\n1\n2\n3\n4\n5\n6\n7\n8\n9\n0" />
+	</ScrollView>
+		
+</LinearLayout>

@@ -1,8 +1,13 @@
 package net.whitecomet.mticket;
 
 import net.whitecomet.mticket.ConnectionService.ConnectionServiceBinder;
+import net.whitecomet.mticket.data.TempStates;
 import android.support.v7.app.ActionBarActivity;
+import android.app.AlertDialog;
+import android.app.ProgressDialog;
 import android.content.ComponentName;
+import android.content.DialogInterface;
+import android.content.DialogInterface.OnClickListener;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.os.Bundle;
@@ -12,43 +17,48 @@ import android.os.Message;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-
+import android.widget.Button;
+import android.widget.EditText;
 
 public class MainActivity extends ActionBarActivity {
 
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
-        
-        Intent intent = new Intent(this.getApplicationContext(),ConnectionService.class);
-        bindService(intent, serviceConnection, BIND_AUTO_CREATE);
-    }
+	@Override
+	protected void onCreate(Bundle savedInstanceState) {
+		super.onCreate(savedInstanceState);
+		setContentView(R.layout.activity_main);
+		bindService();
+		TempStates.load(this.getApplicationContext());
+		EditText editTextIpAddress = (EditText) findViewById(R.id.editText_ipAddress);
+		EditText editTextPort = (EditText) findViewById(R.id.editText_port);
 
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.main, menu);
-        return true;
-    }
+		editTextIpAddress.setText(TempStates.ipAddress);
+		editTextPort.setText(TempStates.port == null ? null : TempStates.port
+				+ "");
+	}
 
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-        if (id == R.id.action_settings) {
-            return true;
-        }
-        return super.onOptionsItemSelected(item);
-    }
-    
-    
-    
-    
+	@Override
+	protected void onDestroy() {
+		super.onDestroy();
+		TempStates.save(this.getApplicationContext());
+	}
+
+	@Override
+	public boolean onCreateOptionsMenu(Menu menu) {
+		getMenuInflater().inflate(R.menu.main, menu);
+		return true;
+	}
+
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+		int id = item.getItemId();
+		if (id == R.id.action_settings) {
+			return true;
+		}
+		return super.onOptionsItemSelected(item);
+	}
+
 	ConnectionServiceBinder connectionBinder;
-	private ServiceConnection serviceConnection = new ServiceConnection(){
+	private ServiceConnection serviceConnection = new ServiceConnection() {
 		@Override
 		public void onServiceConnected(ComponentName arg0, IBinder arg1) {
 			connectionBinder = (ConnectionServiceBinder) arg1;
@@ -58,22 +68,173 @@ public class MainActivity extends ActionBarActivity {
 		public void onServiceDisconnected(ComponentName arg0) {
 		}
 	};
-	
-	
-    public void search(View view){
-        connectionBinder.searchHost(8000, new Handler(){
-    		@Override
-    		public void handleMessage(Message msg) {
-    			super.handleMessage(msg);
-    		}
-        });
-    }
-    
-    public void link(View view){
-        Intent intent = new Intent(this.getApplicationContext(),ConnectionService.class);
-        startService(intent);
-    }
-    public void send(View view){
-    	connectionBinder.send("aaa test", null);
-    }
+
+	private void bindService() {
+		Intent intent = new Intent(this.getApplicationContext(),
+				ConnectionService.class);
+		bindService(intent, serviceConnection, BIND_AUTO_CREATE);
+	}
+
+	public void searchHost(View view) {
+		final EditText editTextIpAddress = (EditText) findViewById(R.id.editText_ipAddress);
+		final EditText editTextPort = (EditText) findViewById(R.id.editText_port);
+		int port;
+		try {
+			port = Integer.parseInt(editTextPort.getText().toString());
+		} catch (Exception e) {
+			port = 8000;
+		}
+
+		final CharSequence strDialogTitle = getString(R.string.ProgressDialog_wait_title);
+		final CharSequence strDialogBody = getString(R.string.ProgressDialog_search_content);
+		final ProgressDialog myDialog = ProgressDialog.show(this,
+				strDialogTitle, strDialogBody, true);
+
+		connectionBinder.searchHost(port, new Handler() {
+			@Override
+			public void handleMessage(Message msg) {
+				myDialog.dismiss();
+				AlertDialog.Builder builder = new AlertDialog.Builder(
+						MainActivity.this);
+				builder.setTitle(getString(R.string.AlertDialog_searchResult_title_failure));
+				builder.setNeutralButton(getString(R.string.close), null);
+
+				switch (msg.what) {
+				case 0:
+					String ip = msg.getData().getString("ip");
+					int port = msg.getData().getInt("port");
+					String str = String
+							.format(getString(R.string.AlertDialog_searchResult_content_0),
+									ip, port);
+					builder.setMessage(str);
+					builder.setTitle(getString(R.string.AlertDialog_searchResult_title_success));
+					editTextIpAddress.setText(ip);
+					editTextPort.setText(port + "");
+					break;
+				case 1:
+					builder.setMessage(getString(R.string.AlertDialog_searchResult_content_1));
+					editTextIpAddress.setText("");
+					editTextPort.setText("");
+					break;
+				case 2:
+					builder.setMessage(getString(R.string.AlertDialog_searchResult_content_2));
+					editTextIpAddress.setText("");
+					editTextPort.setText("");
+					break;
+				}
+				builder.show();
+			}
+		});
+
+	}
+
+	public void connectHost(final View view) {
+		final EditText editTextIpAddress = (EditText) findViewById(R.id.editText_ipAddress);
+		final EditText editTextPort = (EditText) findViewById(R.id.editText_port);
+		int port;
+		try {
+			port = Integer.parseInt(editTextPort.getText().toString());
+		} catch (Exception e) {
+			port = -1;
+		}
+		final String ipAddress = editTextIpAddress.getText().toString();
+
+		final CharSequence strDialogTitle = getString(R.string.ProgressDialog_wait_title);
+		final CharSequence strDialogBody = getString(R.string.ProgressDialog_connect_content);
+		final ProgressDialog myDialog = ProgressDialog.show(this,
+				strDialogTitle, strDialogBody, true);
+		final int fport = port;
+		connectionBinder.connectHost(ipAddress, port, new Handler() {
+			@Override
+			public void handleMessage(Message msg) {
+				myDialog.dismiss();
+				AlertDialog.Builder builder = new AlertDialog.Builder(
+						MainActivity.this);
+
+				switch (msg.what) {
+				case 0:
+					TempStates.ipAddress = ipAddress;
+					TempStates.port = (fport == -1 ? null : fport);
+					editTextIpAddress.setEnabled(false);
+					editTextPort.setEnabled(false);
+					Button connectButton = (Button) findViewById(R.id.button_connect_host);
+					connectButton.setEnabled(false);
+					connectButton.setVisibility(View.GONE);
+					Button disconnectButton = (Button) findViewById(R.id.button_disconnect_host);
+					disconnectButton.setEnabled(true);
+					disconnectButton.setVisibility(View.VISIBLE);
+					((Button) findViewById(R.id.button_search_host))
+							.setEnabled(false);
+
+					builder.setTitle(getString(R.string.AlertDialog_connectResult_title_success));
+					builder.setMessage(getString(R.string.AlertDialog_connectResult_content_0));
+					builder.setPositiveButton(getString(R.string.yes),
+							new OnClickListener() {
+								@Override
+								public void onClick(DialogInterface dialog,
+										int which) {
+									MainActivity.this.updateDatebase(view);
+								}
+							});
+					builder.setNegativeButton(getString(R.string.no), null);
+					builder.show();
+					break;
+				case 1:
+					builder.setTitle(getString(R.string.AlertDialog_connectResult_title_failure));
+					builder.setMessage(getString(R.string.AlertDialog_connectResult_content_1));
+					builder.setNeutralButton(getString(R.string.close), null);
+					builder.show();
+					break;
+				}
+			}
+		});
+	}
+
+	public void disconnectHost(View view) {
+		EditText editTextIpAddress = (EditText) findViewById(R.id.editText_ipAddress);
+		EditText editTextPort = (EditText) findViewById(R.id.editText_port);
+		editTextIpAddress.setEnabled(true);
+		editTextPort.setEnabled(true);
+		Button connectButton = (Button) findViewById(R.id.button_connect_host);
+		connectButton.setEnabled(true);
+		connectButton.setVisibility(View.VISIBLE);
+		Button disconnectButton = (Button) findViewById(R.id.button_disconnect_host);
+		disconnectButton.setEnabled(false);
+		disconnectButton.setVisibility(View.GONE);
+		((Button) findViewById(R.id.button_search_host)).setEnabled(true);
+	}
+
+	public void updateDatebase(View view) {
+		final CharSequence strDialogTitle = getString(R.string.ProgressDialog_wait_title);
+		final CharSequence strDialogBody = getString(R.string.ProgressDialog_updateDatabase_content__0);
+
+		final ProgressDialog myDialog = new ProgressDialog(this);
+
+		myDialog.setTitle(strDialogTitle);
+		myDialog.setMessage(strDialogBody);
+		myDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
+		myDialog.setIndeterminate(true);
+		myDialog.show();
+
+		connectionBinder.updateDatebase(new Handler() {
+			@Override
+			public void handleMessage(Message msg) {
+				switch (msg.what) {
+				case -1:
+					myDialog.setMessage(getString(R.string.ProgressDialog_updateDatabase_content__1));
+					break;
+				case -2:
+					myDialog.setMessage(getString(R.string.ProgressDialog_updateDatabase_content__2));
+					break;
+				case -3:
+
+					break;
+				case 0:
+					myDialog.dismiss();
+					break;
+				case 1:
+				}
+			}
+		});
+	}
 }
