@@ -213,7 +213,7 @@ public class MainActivity extends ActionBarActivity {
 		myDialog.setTitle(strDialogTitle);
 		myDialog.setMessage(strDialogBody);
 		myDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
-		myDialog.setIndeterminate(true);
+		myDialog.setIndeterminate(false);
 		myDialog.show();
 
 		connectionBinder.updateDatebase(new Handler() {
@@ -222,12 +222,18 @@ public class MainActivity extends ActionBarActivity {
 				switch (msg.what) {
 				case -1:
 					myDialog.setMessage(getString(R.string.ProgressDialog_updateDatabase_content__1));
+					myDialog.setProgress(5);
 					break;
 				case -2:
 					myDialog.setMessage(getString(R.string.ProgressDialog_updateDatabase_content__2));
+					myDialog.setProgress(15);
 					break;
 				case -3:
-
+					myDialog.setMessage(getString(R.string.ProgressDialog_updateDatabase_content__3));
+					myDialog.setProgress(40);
+					break;
+				case -4:
+					myDialog.setProgress(40+msg.arg1*60/msg.arg2);
 					break;
 				case 0:
 					myDialog.dismiss();

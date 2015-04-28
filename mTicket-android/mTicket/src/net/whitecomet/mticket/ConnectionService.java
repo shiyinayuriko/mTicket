@@ -100,7 +100,7 @@ public class ConnectionService extends Service {
 						myhandler.sendEmptyMessage(-2);
 						CodeTabel table = new Gson().fromJson(json.trim(), CodeTabel.class);
 						myhandler.sendEmptyMessage(-3);
-						new Database(ConnectionService.this.getApplicationContext()).initializeCodeTable(table);
+						new Database(ConnectionService.this.getApplicationContext()).initializeCodeTable(table,myhandler);
 						myhandler.sendEmptyMessage(0);
 					}catch(SocketConnectException | NoInputStringException e){
 						myhandler.sendEmptyMessage(1);

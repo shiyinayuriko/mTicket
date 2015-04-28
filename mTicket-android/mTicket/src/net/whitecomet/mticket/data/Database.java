@@ -7,6 +7,8 @@ import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.database.sqlite.SQLiteStatement;
+import android.os.Handler;
+import android.os.Message;
 
 public class Database extends SQLiteOpenHelper {
 	public static final String dataBaseName = "coding.db";
@@ -24,8 +26,8 @@ public class Database extends SQLiteOpenHelper {
 	@Override
 	public void onCreate(SQLiteDatabase db) {
 	}
-
-	public void initializeCodeTable(CodeTabel table) {
+	
+	public void initializeCodeTable(CodeTabel table,Handler handler) {
 		SQLiteDatabase db = getWritableDatabase();
 		db.execSQL("DROP TABLE IF EXISTS " + codeTableName);
 		db.execSQL("DROP TABLE IF EXISTS " + codeInfoTableName);
@@ -64,12 +66,22 @@ public class Database extends SQLiteOpenHelper {
 		for(int i=0;i<columns.length;i++) sql2 += ",?";
 		sql2 += ")";
 		
+
+		int index = 0;
+
 		SQLiteStatement stat1 = db.compileStatement(sql);
 		SQLiteStatement stat2 = db.compileStatement(sql2);
-
 		db.beginTransaction();
-		
 		for(CodeInfo info :table.infos){
+			index++;
+			if(handler!=null && index%TempStates.severSettings.proress_step_update_database==0){
+				Message msg = new Message();
+				msg.what = -4;
+				msg.arg1 = index;		
+				msg.arg2 = table.infos.length;
+				handler.sendMessage(msg);
+			}
+			
 			stat1.bindLong(1, info.id);
 			stat1.bindString(2, info.code);
 

@@ -31,7 +31,8 @@
 	
 	<string name="ProgressDialog_updateDatabase_content__0">数据库连接中</string>
 	<string name="ProgressDialog_updateDatabase_content__1">数据库下载中</string>
-	<string name="ProgressDialog_updateDatabase_content__2">数据库处理中</string>
-		
+	<string name="ProgressDialog_updateDatabase_content__2">数据库解析中</string>
+	<string name="ProgressDialog_updateDatabase_content__3">数据库保存中</string>
+			
 		
 </resources>

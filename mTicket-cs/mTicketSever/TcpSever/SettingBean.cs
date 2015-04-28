@@ -12,8 +12,9 @@ namespace mTicket
     {
         [JsonIgnore]
         public static readonly SettingBean Instance = GetSettings();
-        
+
         public int timer;
+        public int proress_step_update_database;
 
         public string GetJson()
         {
@@ -25,7 +26,8 @@ namespace mTicket
         {
             var ret = new SettingBean
             {
-                timer = Convert.ToInt32(ConfigurationManager.AppSettings["timer"])
+                timer = Convert.ToInt32(ConfigurationManager.AppSettings["timer"]),
+                proress_step_update_database = Convert.ToInt32(ConfigurationManager.AppSettings["proress_step_update_database"])
             };
             return ret;
         }
