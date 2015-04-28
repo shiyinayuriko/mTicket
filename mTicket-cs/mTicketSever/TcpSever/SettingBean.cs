@@ -6,7 +6,7 @@ using System.Text;
 
 using Newtonsoft.Json;
 
-namespace mTicketSever
+namespace mTicket
 {
     class SettingBean
     {

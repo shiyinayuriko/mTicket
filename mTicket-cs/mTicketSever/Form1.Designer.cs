@@ -1,4 +1,4 @@
-﻿namespace mTicketSever
+﻿namespace mTicket
 {
     partial class Form1
     {

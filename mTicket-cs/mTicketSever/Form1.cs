@@ -7,7 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Windows.Forms;
 
-namespace mTicketSever
+namespace mTicket
 {
     public partial class Form1 : Form
     {
@@ -23,7 +23,7 @@ namespace mTicketSever
             t.CallbackList.Add("aaa", new SampleCallback(this));
             t.CallbackList.Add("ping", new PingCallback(this));
             t.CallbackList.Add("connect", new ConnectCallback(this));
-            t.CallbackList.Add("codeTable", new CodeTableCallback(this));
+            t.CallbackList.Add("codeTable", new CodeTableCallback(this, "C:/Users/文戎/Desktop/data.db"));
             t.StartListen();
             button1.Enabled = false;          
         }

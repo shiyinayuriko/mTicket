@@ -3,15 +3,17 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace mTicketSever
+namespace mTicket
 {
     class CodeTableCallback:ICallback
     {
         private Form1 form1;
 
-        public CodeTableCallback(Form1 form1)
+        private CodeTable _codeTable;
+        public CodeTableCallback(Form1 form1,string dataPath)
         {
             this.form1 = form1;
+            _codeTable = DataHandler.LoadDatabase(dataPath);
         }
         public void UpdateLine(SocketBackEventArgs e)
         {
@@ -22,7 +24,7 @@ namespace mTicketSever
         {
 
             UpdateLine(e);
-            return (string)e.ReciveData;
+            return _codeTable.GetJson();
         }
     }
 }

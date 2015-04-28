@@ -4,7 +4,7 @@ using System.Linq;
 using System.Net;
 using System.Text;
 
-namespace mTicketSever
+namespace mTicket
 {
     public class SocketBackEventArgs : EventArgs
     {

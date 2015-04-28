@@ -4,13 +4,10 @@ using System.Linq;
 using System.Text;
 using Newtonsoft.Json;
 
-namespace mTicketSever
+namespace mTicket
 {
-    class CodeTable
+    public class CodeTable
     {
-        
-
-
         public string[] columns;
         public CodeInfo[] infos;
 
@@ -21,7 +18,7 @@ namespace mTicketSever
 
     }
 
-    class CodeInfo
+    public class CodeInfo
     {
         public int id;
         public string code;

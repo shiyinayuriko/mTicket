@@ -1,5 +1,6 @@
 package net.whitecomet.mticket.data;
 
+import net.whitecomet.mticket.data.beans.CodeInfo;
 import net.whitecomet.mticket.data.beans.CodeTabel;
 import android.content.ContentValues;
 import android.content.Context;
@@ -55,12 +56,37 @@ public class Database extends SQLiteOpenHelper {
 		for (int i = 0; i < columns.length; i++) sql += ",arg" + i + " TEXT";
 		sql += " );";
 		db.execSQL(sql);
+		
+		sql = "insert into "+codeTableName+"(id,code) values(?,?)";
+		String sql2 = "insert into "+codeInfoTableName+"(id";
+		for(int i=0;i<columns.length;i++) sql2 += ",arg" +i;
+		sql2 += ") values(?";
+		for(int i=0;i<columns.length;i++) sql2 += ",?";
+		sql2 += ")";
+		
+		SQLiteStatement stat1 = db.compileStatement(sql);
+		SQLiteStatement stat2 = db.compileStatement(sql2);
+
+		db.beginTransaction();
+		
+		for(CodeInfo info :table.infos){
+			stat1.bindLong(1, info.id);
+			stat1.bindString(2, info.code);
+
+			stat2.bindLong(1, info.id);
+			for(int i=0;i<info.info.length;i++){
+				stat2.bindString(2+i, info.info[i]);
+
+			}
+			stat1.execute();
+			stat2.execute();
+		}
+		db.setTransactionSuccessful();
+		db.endTransaction();
 
 		sql = "CREATE TABLE " + checkinTableName + " (_ID INTEGER PRIMARY KEY,id INTEGER,time TEXT );";
 		db.execSQL(sql);
-		
-//        SQLiteStatement stat = db.compileStatement(sql);  
-
+		db.close();
 	}
 
 	@Override
