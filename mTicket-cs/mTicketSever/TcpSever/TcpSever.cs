@@ -53,11 +53,11 @@ namespace mTicketSever
         private string ReciveCalkBack(string r,IPEndPoint endPoint)
         {
             var keys = CallbackList.Keys;
-            var ret = "\0";
+            var ret = "";
             foreach(var key in keys){
                 if (!r.StartsWith(key)) continue;
                 var e = new SocketBackEventArgs { ReciveData = r, EndPoint = endPoint };
-                ret = CallbackList[key].dealCommand(e);
+                ret = CallbackList[key].DealCommand(e);
             }
             return ret;
         }

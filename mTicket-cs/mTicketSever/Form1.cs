@@ -22,9 +22,10 @@ namespace mTicketSever
             var t = new TcpSever {Port = 8000};
             t.CallbackList.Add("aaa", new SampleCallback(this));
             t.CallbackList.Add("ping", new PingCallback(this));
+            t.CallbackList.Add("connect", new ConnectCallback(this));
+            t.CallbackList.Add("codeTable", new CodeTableCallback(this));
             t.StartListen();
-            button1.Enabled = false;
-            
+            button1.Enabled = false;          
         }
     }
 }
