@@ -232,7 +232,7 @@ namespace mTicket
         {
             using (SQLiteCommand cmd = new SQLiteCommand(_conn))
             {
-                long time = Convert.ToInt64((DateTime.Now - DateTime.Parse("1970-1-1")).TotalMilliseconds);//+8
+                long time = Convert.ToInt64((DateTime.UtcNow - new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc)).TotalMilliseconds);//+8
 
                 cmd.CommandText = "insert into " + CheckinTableName + " (_id, checkin_time,sync_time) values(@_id,@checkin_time, @sync_time)";
                 foreach (var checkinData in checkinDatas)
