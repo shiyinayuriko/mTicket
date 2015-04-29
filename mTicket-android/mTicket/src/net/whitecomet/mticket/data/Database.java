@@ -1,9 +1,13 @@
 package net.whitecomet.mticket.data;
 
+import java.util.ArrayList;
+
+import net.whitecomet.mticket.data.beans.CheckinData;
 import net.whitecomet.mticket.data.beans.CodeInfo;
 import net.whitecomet.mticket.data.beans.CodeTabel;
 import android.content.ContentValues;
 import android.content.Context;
+import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.database.sqlite.SQLiteStatement;
@@ -117,5 +121,41 @@ public class Database extends SQLiteOpenHelper {
 	public void checkin(int id){
 		String sql = "insert into " + checkinTableName + " (id, checkin_time) values("+id+", datetime('now'))";
 		db.execSQL(sql);
+	}
+	
+	public CheckinData[] markUnsynced(){
+		ArrayList<CheckinData> list = new ArrayList<CheckinData>();
+		
+		ContentValues values = new ContentValues();
+		values.put("sync_time", "-");
+		db.update(checkinTableName, values, "sync_time is NULL", null);
+		
+		Cursor c = db.query(checkinTableName, new String[]{"id","checkin_time"}, "sync_time=?", new String[]{"-"}, null, null, null);
+		while(c.moveToNext()){
+			CheckinData checkinData = new CheckinData();
+			checkinData.id = c.getInt(c.getColumnIndex("id"));
+			checkinData.checkin_time = c.getString(c.getColumnIndex("checkin_time"));
+			list.add(checkinData);
+		}
+		return list.toArray(new CheckinData[0]);
+	}
+	public void setMarksSynced(long timestamp){
+		ContentValues values = new ContentValues();
+		values.put("sync_time", timestamp);
+		db.update(checkinTableName, values, "sync_time =?", new String[]{"-"});
+	}
+	public void addSyncedCheckinData(CheckinData[] checkinDatas){
+		String sql = "insert into "+checkinTableName+"(id,checkin_time,sync_time) values(?,?,?)";
+		SQLiteStatement stat = db.compileStatement(sql);
+		db.beginTransaction();
+		
+		for(CheckinData checkin:checkinDatas){
+			stat.bindLong(1, checkin.id);
+			stat.bindString(2, checkin.checkin_time);
+			stat.bindLong(3, checkin.sync_time);
+			stat.execute();
+		}
+		db.setTransactionSuccessful();
+		db.endTransaction();
 	}
 }

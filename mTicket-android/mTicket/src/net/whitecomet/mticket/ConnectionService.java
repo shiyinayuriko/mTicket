@@ -6,6 +6,7 @@ import com.google.gson.Gson;
 
 import net.whitecomet.mticket.data.Database;
 import net.whitecomet.mticket.data.TempStates;
+import net.whitecomet.mticket.data.beans.CheckinData;
 import net.whitecomet.mticket.data.beans.CodeTabel;
 import net.whitecomet.mticket.data.beans.SeverSettings;
 import net.whitecomet.mticket.tcpClient.NoInputStringException;
@@ -43,6 +44,32 @@ public class ConnectionService extends Service {
 		
 		return START_REDELIVER_INTENT;
 	}	
+	
+	public void syncCheckin(){
+		try{
+			tcp.connect();
+			Gson gson = new Gson();
+			
+			long timestamp = TempStates.instance(this).getSyncTimetamp();
+			CheckinData[] checkin = Database.getInstance(ConnectionService.this).markUnsynced();
+			
+			String ret = tcp.call("syncCheckin "+ timestamp + " " + gson.toJson(checkin));
+			
+			long newTimestamp = Long.parseLong(ret.substring(0,ret.indexOf(' ')));
+			String json = ret.substring(ret.indexOf(' ')+1);
+			
+			CheckinData[] retCheckin = gson.fromJson(json, CheckinData[].class); 
+			
+			Database.getInstance(ConnectionService.this).addSyncedCheckinData(retCheckin);
+			Database.getInstance(ConnectionService.this).setMarksSynced(newTimestamp);
+			
+			TempStates.instance(this).setSyncTimetamp(newTimestamp);
+		}catch(SocketConnectException | NoInputStringException e){
+			e.printStackTrace();
+		}finally{
+			tcp.disConnect();
+		}
+	}
 	
 	public class ConnectionServiceBinder extends Binder{
     	public void searchHost(final int port,Handler handler){
@@ -112,16 +139,12 @@ public class ConnectionService extends Service {
     	}
     	
     	public void syncCheckin(){
-    		try{
-				tcp.connect();
-				String jsonS = 
-				String json = tcp.call("syncCheckin");
-
-    		}catch(SocketConnectException | NoInputStringException e){
-    			
-			}finally{
-				tcp.disConnect();
-			}
+    		new Thread(){
+    			@Override
+    			public void run() {
+    				ConnectionService.this.syncCheckin();
+    			}
+    		}.start();
     	}
     }
 	

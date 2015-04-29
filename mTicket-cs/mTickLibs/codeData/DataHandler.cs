@@ -129,6 +129,7 @@ namespace mTicket
                             case "code":
                                 info.code = reader.GetString(i); break;
                             default:
+                                //"arg" = 3
                                 int argn = Convert.ToInt32(filedName.Substring(3));
                                 info.info[argn] = reader.GetString(i); break;
                         }
@@ -219,21 +220,40 @@ namespace mTicket
             }
             conn.Close();
         }
+      
         public CheckinData[] GetCheckinDatas(long fromTimestamp)
         {
+            List<CheckinData> ret = new List<CheckinData>();
             using (SQLiteCommand cmd = new SQLiteCommand(_conn))
             {
-                //TODO notsure
-                cmd.CommandText = "SELECT * FROM " + CheckinTableName + " WHERE sync_time>" + fromTimestamp;
+                cmd.CommandText = "SELECT * FROM " + CheckinTableName + " WHERE sync_time>=" + fromTimestamp;
+                SQLiteDataReader reader = cmd.ExecuteReader();
+                while (reader.Read())
+                {
+                    CheckinData checkinData = new CheckinData();
+                    for (var i = 0; i < reader.FieldCount; i++)
+                    {
+                        string filedName = reader.GetName(i);
+                        switch (filedName)
+                        {
+                            case "_id": checkinData.id = reader.GetInt32(i); break;
+                            case "checkin_time":
+                                checkinData.checkin_time = reader.GetString(i);break;
+                            case "sync_time": checkinData.sync_time = reader.GetInt64(i);break;
+                        }
+                    }
+                    ret.Add(checkinData);
+                }
             }
-            return null;
+            return ret.ToArray();
         }
-        public void SetCheckinDatas(CheckinData[] checkinDatas)
+        public long SetCheckinDatas(CheckinData[] checkinDatas, bool hasOwnTime = false)
         {
+            long time = Convert.ToInt64((DateTime.UtcNow - new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc)).TotalMilliseconds);
+
             using (SQLiteCommand cmd = new SQLiteCommand(_conn))
             {
-                long time = Convert.ToInt64((DateTime.UtcNow - new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc)).TotalMilliseconds);//+8
-
+                var transaction = _conn.BeginTransaction();
                 cmd.CommandText = "insert into " + CheckinTableName + " (_id, checkin_time,sync_time) values(@_id,@checkin_time, @sync_time)";
                 foreach (var checkinData in checkinDatas)
                 {
@@ -241,11 +261,13 @@ namespace mTicket
                     {
                         new SQLiteParameter("@_id", checkinData.id),
                         new SQLiteParameter("@checkin_time", checkinData.checkin_time),
-                        new SQLiteParameter("@sync_time", time),
+                        new SQLiteParameter("@sync_time",hasOwnTime?checkinData.sync_time:time),
                     });
                     cmd.ExecuteNonQuery();
                 }
+                transaction.Commit();
             }
+            return time;
         }
     }
 }

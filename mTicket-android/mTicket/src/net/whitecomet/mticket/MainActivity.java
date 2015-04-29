@@ -245,6 +245,10 @@ public class MainActivity extends ActionBarActivity {
 	}
 	
 	public void test(View view){
+		connectionBinder.syncCheckin();
+		startService(new Intent(this,ConnectionService.class));
+	}
+	public void test2(View view){
 		Database.getInstance(this).checkin(123);
 	}
 }

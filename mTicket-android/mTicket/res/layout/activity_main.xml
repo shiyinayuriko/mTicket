@@ -70,7 +70,12 @@
 	    android:layout_height="wrap_content"
 	    android:text="text" 
 	    android:onClick="test"/>
-	
+	<Button
+	    android:id="@+id/button2"
+	    android:layout_width="match_parent"
+	    android:layout_height="wrap_content"
+	    android:text="text2" 
+	    android:onClick="test2"/>
 	<TextView 
 		android:id="@+id/text_states"
 		android:layout_width="match_parent"

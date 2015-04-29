@@ -28,10 +28,11 @@ namespace mTicket
             t.CallbackList.Add("ping", new PingCallback(this));
             t.CallbackList.Add("connect", new ConnectCallback(this));
             t.CallbackList.Add("codeTable", new CodeTableCallback(this, db));
-            t.CallbackList.Add("syncCheckin", new SyncCallback(this));
+            t.CallbackList.Add("syncCheckin", new SyncCallback(this, db));
             t.StartListen();
             button1.Enabled = false;
-            db.SetCheckinDatas(new[] { new CheckinData() { checkin_time = "1-2-3-4", id = 222 } });
+//            db.SetCheckinDatas(new[] { new CheckinData() { checkin_time = "1-2-3-4", id = 222 } });
+//            var tmp = db.GetCheckinDatas(1);
         }
     }
 }
