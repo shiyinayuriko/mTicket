@@ -77,7 +77,7 @@ public class ConnectionService extends Service {
     	    		try {
 						tcp.connect();
 						String json = tcp.call("connect");
-						TempStates.severSettings = new Gson().fromJson(json.trim(), SeverSettings.class);
+						TempStates.instance(ConnectionService.this).severSettings = new Gson().fromJson(json.trim(), SeverSettings.class);
 						myhandler.sendEmptyMessage(0);
 					} catch (SocketConnectException|NoInputStringException e) {
 						myhandler.sendEmptyMessage(1);
@@ -100,7 +100,7 @@ public class ConnectionService extends Service {
 						myhandler.sendEmptyMessage(-2);
 						CodeTabel table = new Gson().fromJson(json.trim(), CodeTabel.class);
 						myhandler.sendEmptyMessage(-3);
-						new Database(ConnectionService.this.getApplicationContext()).initializeCodeTable(table,myhandler);
+						Database.getInstance(ConnectionService.this).initializeCodeTable(table,myhandler);
 						myhandler.sendEmptyMessage(0);
 					}catch(SocketConnectException | NoInputStringException e){
 						myhandler.sendEmptyMessage(1);

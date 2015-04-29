@@ -15,6 +15,7 @@ namespace mTicket
 
         public int timer;
         public int proress_step_update_database;
+        public int tcp_timeout;
 
         public string GetJson()
         {
@@ -28,6 +29,7 @@ namespace mTicket
             {
                 timer = Convert.ToInt32(ConfigurationManager.AppSettings["timer"]),
                 proress_step_update_database = Convert.ToInt32(ConfigurationManager.AppSettings["proress_step_update_database"])
+                tcp_timeout = Convert.ToInt32(ConfigurationManager.AppSettings["tcp_timeout"])
             };
             return ret;
         }

@@ -19,16 +19,25 @@ public class Database extends SQLiteOpenHelper {
 	public static final String codeInfoColumnTableName = "code_info_column";
 	public static final String checkinTableName = "checkin";
 
-	public Database(Context context) {
+	private static Database instance = null;
+	
+	private SQLiteDatabase db;
+	public static Database getInstance(Context context){
+		if(instance==null) instance = new Database(context.getApplicationContext());
+		return instance;
+	}
+	private Context context;
+	private Database(Context context) {
 		super(context, dataBaseName, null, dbVersion);
+		db = getWritableDatabase();
 	}
 
 	@Override
 	public void onCreate(SQLiteDatabase db) {
+		// TODO Auto-generated method stub
 	}
 	
 	public void initializeCodeTable(CodeTabel table,Handler handler) {
-		SQLiteDatabase db = getWritableDatabase();
 		db.execSQL("DROP TABLE IF EXISTS " + codeTableName);
 		db.execSQL("DROP TABLE IF EXISTS " + codeInfoTableName);
 		db.execSQL("DROP TABLE IF EXISTS " + codeInfoColumnTableName);
@@ -74,7 +83,7 @@ public class Database extends SQLiteOpenHelper {
 		db.beginTransaction();
 		for(CodeInfo info :table.infos){
 			index++;
-			if(handler!=null && index%TempStates.severSettings.proress_step_update_database==0){
+			if(handler!=null && index%TempStates.instance(context).severSettings.proress_step_update_database==0){
 				Message msg = new Message();
 				msg.what = -4;
 				msg.arg1 = index;		
@@ -96,9 +105,8 @@ public class Database extends SQLiteOpenHelper {
 		db.setTransactionSuccessful();
 		db.endTransaction();
 
-		sql = "CREATE TABLE " + checkinTableName + " (_ID INTEGER PRIMARY KEY,id INTEGER,time TEXT );";
+		sql = "CREATE TABLE " + checkinTableName + " (_ID INTEGER PRIMARY KEY,id INTEGER,checkin_time TIME,sync_time timestamp);";
 		db.execSQL(sql);
-		db.close();
 	}
 
 	@Override
@@ -106,4 +114,8 @@ public class Database extends SQLiteOpenHelper {
 		// TODO Auto-generated method stub
 	}
 
+	public void checkin(int id){
+		String sql = "insert into " + checkinTableName + " (id, checkin_time) values("+id+", datetime('now'))";
+		db.execSQL(sql);
+	}
 }

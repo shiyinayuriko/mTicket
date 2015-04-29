@@ -1,6 +1,7 @@
 package net.whitecomet.mticket;
 
 import net.whitecomet.mticket.ConnectionService.ConnectionServiceBinder;
+import net.whitecomet.mticket.data.Database;
 import net.whitecomet.mticket.data.TempStates;
 import android.support.v7.app.ActionBarActivity;
 import android.app.AlertDialog;
@@ -27,19 +28,18 @@ public class MainActivity extends ActionBarActivity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
 		bindService();
-		TempStates.load(this.getApplicationContext());
+		TempStates tempStates = TempStates.instance(this);
+		
 		EditText editTextIpAddress = (EditText) findViewById(R.id.editText_ipAddress);
 		EditText editTextPort = (EditText) findViewById(R.id.editText_port);
 
-		editTextIpAddress.setText(TempStates.ipAddress);
-		editTextPort.setText(TempStates.port == null ? null : TempStates.port
-				+ "");
+		editTextIpAddress.setText(tempStates.getIpaddress());
+		editTextPort.setText(tempStates.getPort() == null ? null : tempStates.getPort() + "");
 	}
 
 	@Override
 	protected void onDestroy() {
 		super.onDestroy();
-		TempStates.save(this.getApplicationContext());
 	}
 
 	@Override
@@ -143,6 +143,7 @@ public class MainActivity extends ActionBarActivity {
 		final CharSequence strDialogBody = getString(R.string.ProgressDialog_connect_content);
 		final ProgressDialog myDialog = ProgressDialog.show(this,
 				strDialogTitle, strDialogBody, true);
+		
 		final int fport = port;
 		connectionBinder.connectHost(ipAddress, port, new Handler() {
 			@Override
@@ -153,8 +154,7 @@ public class MainActivity extends ActionBarActivity {
 
 				switch (msg.what) {
 				case 0:
-					TempStates.ipAddress = ipAddress;
-					TempStates.port = (fport == -1 ? null : fport);
+					TempStates.instance(MainActivity.this).setHost(ipAddress, fport);
 					editTextIpAddress.setEnabled(false);
 					editTextPort.setEnabled(false);
 					Button connectButton = (Button) findViewById(R.id.button_connect_host);
@@ -242,5 +242,9 @@ public class MainActivity extends ActionBarActivity {
 				}
 			}
 		});
+	}
+	
+	public void test(View view){
+		Database.getInstance(this).checkin(123);
 	}
 }

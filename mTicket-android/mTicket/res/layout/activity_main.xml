@@ -63,6 +63,13 @@
 		    android:onClick="disconnectHost"
 		    android:visibility="gone"/>
 	</LinearLayout>
+
+	<Button
+	    android:id="@+id/button1"
+	    android:layout_width="match_parent"
+	    android:layout_height="wrap_content"
+	    android:text="text" 
+	    android:onClick="test"/>
 	
 	<TextView 
 		android:id="@+id/text_states"
