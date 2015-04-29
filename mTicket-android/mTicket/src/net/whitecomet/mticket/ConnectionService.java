@@ -111,6 +111,18 @@ public class ConnectionService extends Service {
 			}.start();
     	}
     	
+    	public void syncCheckin(){
+    		try{
+				tcp.connect();
+				String jsonS = 
+				String json = tcp.call("syncCheckin");
+
+    		}catch(SocketConnectException | NoInputStringException e){
+    			
+			}finally{
+				tcp.disConnect();
+			}
+    	}
     }
 	
 	

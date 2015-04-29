@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Xml.Linq;
+using mTickLibs.codeData;
 using NPOI.HSSF.UserModel;
 using NPOI.SS.UserModel;
 using NPOI.XSSF.UserModel;
@@ -64,93 +65,40 @@ namespace mTicket
             return table;
         }
 
+        public static DataBaseHandler getDataBaseHandler(string path)
+        {
+            return new DataBaseHandler(path);
+        }
+    }
+
+    public class DataBaseHandler
+    {
         public static string CodeTableName = "code";
         public static string CodeInfoTableName = "code_info";
         public static string CodeInfoColumnTableName = "code_info_column";
         public static string CheckinTableName = "checkin";
 
-        public static void SaveDatabse(CodeTable codeTable, string path)
+        private readonly SQLiteConnection _conn;
+        public DataBaseHandler(string path)
         {
-            SQLiteConnection.CreateFile(path);
-
-            SQLiteConnection conn = new SQLiteConnection();
-            conn.ConnectionString = new SQLiteConnectionStringBuilder {DataSource = path}.ToString();
-            conn.Open();
-
-            SQLiteCommand cmd = new SQLiteCommand(conn);
-            //column table
-            cmd.CommandText = "CREATE TABLE " + CodeInfoColumnTableName + " (column_index INTEGER,column_name TEXT );";
-            cmd.ExecuteNonQuery();
-            cmd.CommandText = "insert into " + CodeInfoColumnTableName + " (column_index, column_name) values(@column_index, @column_name)";
-            string[] columns = codeTable.columns;
-            for (var i = 0; i < columns.Length; i++)
-            {
-                cmd.Parameters.AddRange(new[]
-                {
-                    new SQLiteParameter("@column_index", i),
-                    new SQLiteParameter("@column_name", columns[i]),
-                });
-                cmd.ExecuteNonQuery();
-            }
-
-            cmd.CommandText = "CREATE TABLE " + CodeTableName + " (_id INTEGER PRIMARY KEY,code TEXT );";
-            cmd.ExecuteNonQuery();
-
-            cmd.CommandText = "CREATE TABLE " + CodeInfoTableName + " (_id INTEGER PRIMARY KEY";
-            for (int i = 0; i < columns.Length; i++) cmd.CommandText += ",arg" + i + " TEXT";
-            cmd.CommandText += " );";
-            cmd.ExecuteNonQuery();
-
-            var transaction = conn.BeginTransaction();
-            cmd.CommandText = "replace into " + CodeTableName + " (_id, code) values(@_id, @code)";
-            foreach (var info in codeTable.infos)
-            {
-                cmd.Parameters.AddRange(new[]
-                {
-                    new SQLiteParameter("@_id", info.id),
-                    new SQLiteParameter("@code", info.code),
-                });
-                cmd.ExecuteNonQuery();
-            }
-            cmd.CommandText = "replace into " + CodeInfoTableName + " (_id";
-            for (int i = 0; i < columns.Length; i++) cmd.CommandText += ",arg" + i;
-            cmd.CommandText += ") values(@_id";
-            for (int i = 0; i < columns.Length; i++) cmd.CommandText += ",@arg" + i;
-            cmd.CommandText += " );";
-            foreach (var info in codeTable.infos)
-            {
-                cmd.Parameters.Add(new SQLiteParameter("@_id", info.id));
-                for (int i = 0; i < columns.Length; i++)
-                {
-                    cmd.Parameters.Add(new SQLiteParameter("@arg" + i, info.info[i]));
-                }
-                cmd.ExecuteNonQuery();
-            }
-            transaction.Commit();
-
-
-            cmd.CommandText ="CREATE TABLE " + CheckinTableName + " (_id INTEGER,time TEXT );";
-            cmd.ExecuteNonQuery();
-            //TODO
+            _conn = new SQLiteConnection();
+            _conn.ConnectionString = new SQLiteConnectionStringBuilder { DataSource = path }.ToString();
+            _conn.Open();
         }
 
-        public static CodeTable LoadDatabase(string path)
+
+        public CodeTable LoadCodeTable()
         {
             CodeTable table = new CodeTable();
 
-            SQLiteConnection conn = new SQLiteConnection();
-            conn.ConnectionString = new SQLiteConnectionStringBuilder { DataSource = path }.ToString();
-            conn.Open();
-
             int columnNum;
-
-            using(SQLiteCommand cmd = new SQLiteCommand(conn))
+            using (SQLiteCommand cmd = new SQLiteCommand(_conn))
             {
-                cmd.CommandText = "SELECT COUNT(*) FROM "+CodeInfoColumnTableName;
-                columnNum = int.Parse(cmd.ExecuteScalar().ToString());
+                cmd.CommandText = "SELECT COUNT(*) FROM " + CodeInfoColumnTableName;
+                columnNum = Int32.Parse(cmd.ExecuteScalar().ToString());
             }
             table.columns = new string[columnNum];
-            using (SQLiteCommand cmd = new SQLiteCommand(conn))
+            using (SQLiteCommand cmd = new SQLiteCommand(_conn))
             {
                 cmd.CommandText = "SELECT * FROM " + CodeInfoColumnTableName;
                 SQLiteDataReader reader = cmd.ExecuteReader();
@@ -162,35 +110,142 @@ namespace mTicket
                 }
             }
 
-            using (SQLiteCommand cmd= new SQLiteCommand(conn))
+            using (SQLiteCommand cmd = new SQLiteCommand(_conn))
             {
                 List<CodeInfo> infos = new List<CodeInfo>();
-                cmd.CommandText = string.Format("SELECT * FROM {0},{1} WHERE {0}._id = {1}._id", CodeTableName, CodeInfoTableName);
+                cmd.CommandText = String.Format("SELECT * FROM {0},{1} WHERE {0}._id = {1}._id", CodeTableName, CodeInfoTableName);
                 SQLiteDataReader reader = cmd.ExecuteReader();
                 while (reader.Read())
                 {
                     CodeInfo info = new CodeInfo();
                     info.info = new string[columnNum];
-                    for(var i = 0;i<reader.FieldCount;i++)
+                    for (var i = 0; i < reader.FieldCount; i++)
                     {
                         string filedName = reader.GetName(i);
                         switch (filedName)
                         {
                             case "_id":
-                                info.id = reader.GetInt32(i);break;
+                                info.id = reader.GetInt32(i); break;
                             case "code":
-                                info.code = reader.GetString(i);break;
-                            default :
+                                info.code = reader.GetString(i); break;
+                            default:
                                 int argn = Convert.ToInt32(filedName.Substring(3));
-                                info.info[argn] = reader.GetString(i);break;
+                                info.info[argn] = reader.GetString(i); break;
                         }
                     }
                     infos.Add(info);
                 }
                 table.infos = infos.ToArray();
             }
-            //TODO checkin
             return table;
+        }
+        public static void SaveCodeTable(CodeTable codeTable, string path)
+        {
+            SQLiteConnection.CreateFile(path);
+
+            SQLiteConnection conn = new SQLiteConnection();
+            conn.ConnectionString = new SQLiteConnectionStringBuilder { DataSource = path }.ToString();
+            conn.Open();
+
+
+            using (SQLiteCommand cmd = new SQLiteCommand(conn))
+            {
+                cmd.CommandText = "CREATE TABLE " + CodeInfoColumnTableName + " (column_index INTEGER,column_name TEXT );";
+                cmd.ExecuteNonQuery();
+            }
+            string[] columns;
+            using (SQLiteCommand cmd = new SQLiteCommand(conn))
+            {
+                cmd.CommandText = "insert into " + CodeInfoColumnTableName + " (column_index, column_name) values(@column_index, @column_name)";
+                columns = codeTable.columns;
+                for (var i = 0; i < columns.Length; i++)
+                {
+                    cmd.Parameters.AddRange(new[]
+                {
+                    new SQLiteParameter("@column_index", i),
+                    new SQLiteParameter("@column_name", columns[i]),
+                });
+                    cmd.ExecuteNonQuery();
+                }
+            }
+            using (SQLiteCommand cmd = new SQLiteCommand(conn))
+            {
+                cmd.CommandText = "CREATE TABLE " + CodeTableName + " (_id INTEGER PRIMARY KEY,code TEXT );";
+                cmd.ExecuteNonQuery();
+            }
+
+            using (SQLiteCommand cmd = new SQLiteCommand(conn))
+            {
+                cmd.CommandText = "CREATE TABLE " + CodeInfoTableName + " (_id INTEGER PRIMARY KEY";
+                for (int i = 0; i < columns.Length; i++) cmd.CommandText += ",arg" + i + " TEXT";
+                cmd.CommandText += " );";
+                cmd.ExecuteNonQuery();
+            }
+
+            using (SQLiteCommand cmd = new SQLiteCommand(conn))
+            {
+                var transaction = conn.BeginTransaction();
+                cmd.CommandText = "replace into " + CodeTableName + " (_id, code) values(@_id, @code)";
+                foreach (var info in codeTable.infos)
+                {
+                    cmd.Parameters.AddRange(new[]
+                {
+                    new SQLiteParameter("@_id", info.id),
+                    new SQLiteParameter("@code", info.code),
+                });
+                    cmd.ExecuteNonQuery();
+                }
+                cmd.CommandText = "replace into " + CodeInfoTableName + " (_id";
+                for (int i = 0; i < columns.Length; i++) cmd.CommandText += ",arg" + i;
+                cmd.CommandText += ") values(@_id";
+                for (int i = 0; i < columns.Length; i++) cmd.CommandText += ",@arg" + i;
+                cmd.CommandText += " );";
+                foreach (var info in codeTable.infos)
+                {
+                    cmd.Parameters.Add(new SQLiteParameter("@_id", info.id));
+                    for (int i = 0; i < columns.Length; i++)
+                    {
+                        cmd.Parameters.Add(new SQLiteParameter("@arg" + i, info.info[i]));
+                    }
+                    cmd.ExecuteNonQuery();
+                }
+                transaction.Commit();
+            }
+
+            using (SQLiteCommand cmd = new SQLiteCommand(conn))
+            {
+                cmd.CommandText = "CREATE TABLE " + CheckinTableName + " (_id INTEGER, checkin_time TIME, sync_time timestamp );";
+                cmd.ExecuteNonQuery();  
+            }
+            conn.Close();
+        }
+        public CheckinData[] GetCheckinDatas(long fromTimestamp)
+        {
+            using (SQLiteCommand cmd = new SQLiteCommand(_conn))
+            {
+                //TODO notsure
+                cmd.CommandText = "SELECT * FROM " + CheckinTableName + " WHERE sync_time>" + fromTimestamp;
+            }
+            return null;
+        }
+        public void SetCheckinDatas(CheckinData[] checkinDatas)
+        {
+            using (SQLiteCommand cmd = new SQLiteCommand(_conn))
+            {
+                long time = Convert.ToInt64((DateTime.Now - DateTime.Parse("1970-1-1")).TotalMilliseconds);//+8
+
+                cmd.CommandText = "insert into " + CheckinTableName + " (_id, checkin_time,sync_time) values(@_id,@checkin_time, @sync_time)";
+                foreach (var checkinData in checkinDatas)
+                {
+                    cmd.Parameters.AddRange(new[]
+                    {
+                        new SQLiteParameter("@_id", checkinData.id),
+                        new SQLiteParameter("@checkin_time", checkinData.checkin_time),
+                        new SQLiteParameter("@sync_time", time),
+                    });
+                    cmd.ExecuteNonQuery();
+                }
+            }
         }
     }
 }

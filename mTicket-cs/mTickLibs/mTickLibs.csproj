@@ -79,6 +79,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="codeData\CheckinData.cs" />
     <Compile Include="codeData\CodeTable.cs" />
     <Compile Include="codeData\DataHandler.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

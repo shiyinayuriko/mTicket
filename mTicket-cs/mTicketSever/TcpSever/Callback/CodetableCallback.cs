@@ -10,10 +10,10 @@ namespace mTicket
         private Form1 form1;
 
         private CodeTable _codeTable;
-        public CodeTableCallback(Form1 form1,string dataPath)
+        public CodeTableCallback(Form1 form1,DataBaseHandler dbHandler)
         {
             this.form1 = form1;
-            _codeTable = DataHandler.LoadDatabase(dataPath);
+            _codeTable = dbHandler.LoadCodeTable();
         }
         public void UpdateLine(SocketBackEventArgs e)
         {

@@ -16,7 +16,7 @@ namespace mTicket
             if (saveDb.ShowDialog() == DialogResult.OK)
             {
                 var fName = saveDb.FileName;
-                DataHandler.SaveDatabse(_dataTable,fName);
+                DataBaseHandler.SaveCodeTable(_dataTable, fName);
             }
         }
 
