@@ -202,6 +202,8 @@ public class MainActivity extends ActionBarActivity {
 		disconnectButton.setEnabled(false);
 		disconnectButton.setVisibility(View.GONE);
 		((Button) findViewById(R.id.button_search_host)).setEnabled(true);
+		
+		connectionBinder.stopSync();
 	}
 
 	public void updateDatebase(View view) {
@@ -245,8 +247,9 @@ public class MainActivity extends ActionBarActivity {
 	}
 	
 	public void test(View view){
-		connectionBinder.syncCheckin();
-		startService(new Intent(this,ConnectionService.class));
+//		connectionBinder.syncCheckin();
+//		startService(new Intent(this,ConnectionService.class));
+		connectionBinder.startSync();
 	}
 	public void test2(View view){
 		Database.getInstance(this).checkin(123);

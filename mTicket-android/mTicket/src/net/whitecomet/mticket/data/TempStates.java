@@ -19,7 +19,7 @@ public class TempStates {
         ipAddress = mSharedPreferences.getString("ipAddress", null);
         int mport = mSharedPreferences.getInt("port", -1);
         port = (mport==-1?null:mport);
-        syncTimetamp = mSharedPreferences.getInt("syncTimetamp", 0);
+        syncTimetamp = mSharedPreferences.getLong("syncTimetamp", 0);
         databaseUpdateTime = mSharedPreferences.getInt("databaseUpdateTime", 0);
 	}
 	private SharedPreferences mSharedPreferences;

@@ -1,5 +1,7 @@
 package net.whitecomet.mticket;
 
+import java.util.Date;
+import java.util.Timer;
 import java.util.TimerTask;
 
 import com.google.gson.Gson;
@@ -20,30 +22,40 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Message;
+import android.util.Log;
 
 public class ConnectionService extends Service {
-	TCPClient tcp;
+	private TCPClient tcp;
 	@Override
 	public void onCreate() {
 		super.onCreate();
 		tcp = new TCPClient(this.getApplicationContext());
 	}
 	
-	ConnectionServiceBinder binder = new ConnectionServiceBinder();
+	private ConnectionServiceBinder binder = new ConnectionServiceBinder();
 	@Override
 	public IBinder onBind(Intent arg0) {
 		return binder;
 	}
 
-	
+	private Timer mTimer = new Timer();
+
 	@Override
 	public int onStartCommand(Intent intent, int flags, int startId) {
 		super.onStartCommand(intent, flags, startId);
 		
-//		mTimer.schedule(new MyTimerTask(), 0 , 10 * 1000);
+		mTimer.cancel();
+		mTimer = new Timer();
+		mTimer.schedule(new MyTimerTask(), 0 , TempStates.instance(this).severSettings.timer);
 		
 		return START_REDELIVER_INTENT;
 	}	
+	
+	@Override
+	public void onDestroy() {
+		mTimer.cancel();
+		super.onDestroy();
+	}
 	
 	public void syncCheckin(){
 		try{
@@ -115,6 +127,16 @@ public class ConnectionService extends Service {
     		}.start();
     	}
     	
+    	public void startSync(){
+    		mTimer.cancel();
+    		mTimer = new Timer();
+    		mTimer.schedule(new MyTimerTask(), 0 , TempStates.instance(ConnectionService.this).severSettings.timer);
+    	}
+    	public void stopSync(){
+    		mTimer.cancel();
+    		ConnectionService.this.stopSelf();
+    	}
+    	
     	public void updateDatebase(Handler handler){
     		final Handler myhandler= (handler==null?new Handler():handler);
 			new Thread(){
@@ -138,22 +160,13 @@ public class ConnectionService extends Service {
 			}.start();
     	}
     	
-    	public void syncCheckin(){
-    		new Thread(){
-    			@Override
-    			public void run() {
-    				ConnectionService.this.syncCheckin();
-    			}
-    		}.start();
-    	}
     }
-	
-	
 	
 	private class MyTimerTask extends TimerTask{
 		@Override
 		public void run() {
-			// TODO Auto-generated method stub
+//			Log.i("log", new Date().toString());
+			syncCheckin();
 		}
 	}
 }
