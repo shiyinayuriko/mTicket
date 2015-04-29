@@ -55,7 +55,7 @@ namespace mTicket
             var keys = CallbackList.Keys;
             var ret = "";
             foreach(var key in keys){
-                if (!r.StartsWith(key)) continue;
+                if (r==null || !r.StartsWith(key)) continue;
                 var e = new SocketBackEventArgs { ReciveData = r, EndPoint = endPoint };
                 ret = CallbackList[key].DealCommand(e);
             }

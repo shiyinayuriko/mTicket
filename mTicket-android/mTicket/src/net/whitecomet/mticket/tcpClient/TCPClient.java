@@ -72,7 +72,7 @@ public class TCPClient {
 				int result = proc.waitFor();
 				if (result == 0) {
 					Socket socket = new Socket(curIp, port);
-					socket.setSoTimeout(TempStates.instance(context).severSettings.tcp_timeout);
+					socket.setSoTimeout(5000);
 			        BufferedReader br = new BufferedReader(new InputStreamReader(socket.getInputStream()));
 			        BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream()));
 			        String pingLine = "ping "+Math.random();
@@ -99,7 +99,7 @@ public class TCPClient {
 	public void connect() throws SocketConnectException{
 		try {
 			socket = new Socket(ip, port);
-			socket.setSoTimeout(50000);
+			socket.setSoTimeout(TempStates.instance(context).severSettings==null?50000:TempStates.instance(context).severSettings.tcp_timeout);
 	        br = new BufferedReader(new InputStreamReader(socket.getInputStream()));
 	        bw = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream()));
 		} catch (UnknownHostException e) {

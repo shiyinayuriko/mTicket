@@ -28,7 +28,7 @@ namespace mTicket
             var ret = new SettingBean
             {
                 timer = Convert.ToInt32(ConfigurationManager.AppSettings["timer"]),
-                proress_step_update_database = Convert.ToInt32(ConfigurationManager.AppSettings["proress_step_update_database"])
+                proress_step_update_database = Convert.ToInt32(ConfigurationManager.AppSettings["proress_step_update_database"]),
                 tcp_timeout = Convert.ToInt32(ConfigurationManager.AppSettings["tcp_timeout"])
             };
             return ret;
