@@ -29,7 +29,6 @@ public class MainActivity extends ActionBarActivity {
 		setContentView(R.layout.activity_main);
 		bindService();
 		TempStates tempStates = TempStates.instance(this);
-		
 		EditText editTextIpAddress = (EditText) findViewById(R.id.editText_ipAddress);
 		EditText editTextPort = (EditText) findViewById(R.id.editText_port);
 
@@ -144,17 +143,13 @@ public class MainActivity extends ActionBarActivity {
 		final ProgressDialog myDialog = ProgressDialog.show(this,
 				strDialogTitle, strDialogBody, true);
 		
-		final int fport = port;
 		connectionBinder.connectHost(ipAddress, port, new Handler() {
 			@Override
 			public void handleMessage(Message msg) {
 				myDialog.dismiss();
-				AlertDialog.Builder builder = new AlertDialog.Builder(
-						MainActivity.this);
-
+				AlertDialog.Builder builder = new AlertDialog.Builder( MainActivity.this);
 				switch (msg.what) {
 				case 0:
-					TempStates.instance(MainActivity.this).setHost(ipAddress, fport);
 					editTextIpAddress.setEnabled(false);
 					editTextPort.setEnabled(false);
 					Button connectButton = (Button) findViewById(R.id.button_connect_host);
@@ -163,21 +158,20 @@ public class MainActivity extends ActionBarActivity {
 					Button disconnectButton = (Button) findViewById(R.id.button_disconnect_host);
 					disconnectButton.setEnabled(true);
 					disconnectButton.setVisibility(View.VISIBLE);
-					((Button) findViewById(R.id.button_search_host))
-							.setEnabled(false);
+					((Button) findViewById(R.id.button_search_host)).setEnabled(false);
 
 					builder.setTitle(getString(R.string.AlertDialog_connectResult_title_success));
 					builder.setMessage(getString(R.string.AlertDialog_connectResult_content_0));
-					builder.setPositiveButton(getString(R.string.yes),
-							new OnClickListener() {
+					builder.setPositiveButton(getString(R.string.yes),new OnClickListener() {
 								@Override
-								public void onClick(DialogInterface dialog,
-										int which) {
+								public void onClick(DialogInterface dialog, int which) {
 									MainActivity.this.updateDatebase(view);
 								}
 							});
 					builder.setNegativeButton(getString(R.string.no), null);
 					builder.show();
+					if(TempStates.instance(MainActivity.this).getDatabaseUpdateTime()!=0)
+						connectionBinder.startSync();
 					break;
 				case 1:
 					builder.setTitle(getString(R.string.AlertDialog_connectResult_title_failure));
@@ -206,7 +200,7 @@ public class MainActivity extends ActionBarActivity {
 		connectionBinder.stopSync();
 	}
 
-	public void updateDatebase(View view) {
+	private void updateDatebase(View view) {
 		final CharSequence strDialogTitle = getString(R.string.ProgressDialog_wait_title);
 		final CharSequence strDialogBody = getString(R.string.ProgressDialog_updateDatabase_content__0);
 
@@ -217,7 +211,7 @@ public class MainActivity extends ActionBarActivity {
 		myDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
 		myDialog.setIndeterminate(false);
 		myDialog.show();
-
+		connectionBinder.stopSync();
 		connectionBinder.updateDatebase(new Handler() {
 			@Override
 			public void handleMessage(Message msg) {
@@ -239,6 +233,7 @@ public class MainActivity extends ActionBarActivity {
 					break;
 				case 0:
 					myDialog.dismiss();
+					connectionBinder.startSync();
 					break;
 				case 1:
 				}
@@ -246,12 +241,11 @@ public class MainActivity extends ActionBarActivity {
 		});
 	}
 	
-	public void test(View view){
-//		connectionBinder.syncCheckin();
-//		startService(new Intent(this,ConnectionService.class));
-		connectionBinder.startSync();
+	public void openCamera(View view){
+		//TODO
 	}
 	public void test2(View view){
+		
 		Database.getInstance(this).checkin(123);
 	}
 }

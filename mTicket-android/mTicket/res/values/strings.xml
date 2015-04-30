@@ -13,7 +13,9 @@
 	<string name="button_search_host">搜索服务器</string>
 	<string name="button_connect_host">连接服务器</string>
 	<string name="button_disconnect_host">断开服务器</string>
-		
+	<string name="button_open_camera">打开手机摄像头</string>
+	
+	
 	<string name="ProgressDialog_wait_title">请稍后</string>
 	
 	<string name="ProgressDialog_search_content">搜索服务器中</string>

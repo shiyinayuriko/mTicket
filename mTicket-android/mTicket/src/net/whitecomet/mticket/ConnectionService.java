@@ -107,7 +107,7 @@ public class ConnectionService extends Service {
     			}
     		}.start();
     	}
-    	public void connectHost(String ipAddress,int port,Handler handler){
+    	public void connectHost(final String ipAddress,final int port,Handler handler){
     		tcp.setSeverAddress(ipAddress, port);
     		final Handler myhandler= (handler==null?new Handler():handler);
 			new Thread(){
@@ -117,6 +117,8 @@ public class ConnectionService extends Service {
 						tcp.connect();
 						String json = tcp.call("connect");
 						TempStates.instance(ConnectionService.this).severSettings = new Gson().fromJson(json.trim(), SeverSettings.class);
+						
+						TempStates.instance(ConnectionService.this).setHost(ipAddress, port);
 						myhandler.sendEmptyMessage(0);
 					} catch (SocketConnectException|NoInputStringException e) {
 						myhandler.sendEmptyMessage(1);
@@ -151,6 +153,7 @@ public class ConnectionService extends Service {
 						myhandler.sendEmptyMessage(-3);
 						Database.getInstance(ConnectionService.this).initializeCodeTable(table,myhandler);
 						myhandler.sendEmptyMessage(0);
+						TempStates.instance(ConnectionService.this).setDatabaseUpdateTime(System.currentTimeMillis());
 					}catch(SocketConnectException | NoInputStringException e){
 						myhandler.sendEmptyMessage(1);
 					}finally{

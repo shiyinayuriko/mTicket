@@ -65,11 +65,11 @@
 	</LinearLayout>
 
 	<Button
-	    android:id="@+id/button1"
+	    android:id="@+id/button_open_camera"
 	    android:layout_width="match_parent"
 	    android:layout_height="wrap_content"
-	    android:text="text" 
-	    android:onClick="test"/>
+	    android:text="@string/button_open_camera" 
+	    android:onClick="openCamera"/>
 	<Button
 	    android:id="@+id/button2"
 	    android:layout_width="match_parent"
