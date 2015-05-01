@@ -37,5 +37,22 @@
 	<string name="ProgressDialog_updateDatabase_content__2">数据库解析中</string>
 	<string name="ProgressDialog_updateDatabase_content__3">数据库保存中</string>
 			
+	<string name="broadcast_connected">net.whitecomet.mticket.connected</string>
+	<string name="broadcast_disconnected">net.whitecomet.mticket.disconnected</string>
+	<string name="broadcast_sync_error">net.whitecomet.mticket.sync_error</string>
+	<string name="broadcast_sync_start">net.whitecomet.mticket.sync_start</string>
+	<string name="broadcast_sync_end">net.whitecomet.mticket.sync_end</string>
+	
+	<string name="notification_connected_title">已连接服务器</string>
+	<string name="notification_connected_content">等待与服务器同步</string>
+	<string name="notification_disconnected_title">断开服务器，同步结束</string>
+	<string name="notification_disconnected_content">共上传%1$d条，下载%2$d条 记录</string>
+	<string name="notification_sync_error_title">同步发生错误</string>
+	<string name="notification_sync_error_content">错误：%1$s</string>
+	<string name="notification_sync_start_title">正在同步</string>
+	<string name="notification_sync_start_content">有%1$d条数据需要同步</string>
+	<string name="notification_sync_end_title">同步完成</string>
+	<string name="notification_sync_end_content">于%1$s 上传%2$d条 下载%3$d条 记录</string>
 		
+	
 </resources>

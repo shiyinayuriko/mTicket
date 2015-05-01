@@ -1,5 +1,9 @@
 package net.whitecomet.mticket;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Locale;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -49,7 +53,9 @@ public class ConnectionService extends Service {
 		
 		mTimer.cancel();
 		mTimer = new Timer();
-		mTimer.schedule(new MyTimerTask(), 0 , TempStates.instance(this).severSettings.timer);
+		mTimer.schedule(new MyTimerTask(), 5000 , TempStates.instance(this).severSettings.timer);
+		
+		
 		
 		return START_REDELIVER_INTENT;
 	}	
@@ -60,30 +66,30 @@ public class ConnectionService extends Service {
 		super.onDestroy();
 	}
 	
-	public void syncCheckin(){
+	public CheckinData[] syncCheckin(CheckinData[] checkin) throws Exception{
+		CheckinData[] retCheckin = null ;
 		try{
 			tcp.connect();
 			Gson gson = new Gson();
 			
 			long timestamp = TempStates.instance(this).getSyncTimetamp();
-			CheckinData[] checkin = Database.getInstance(ConnectionService.this).markUnsynced();
-			
 			String ret = tcp.call("syncCheckin "+ timestamp + " " + gson.toJson(checkin));
 			
 			long newTimestamp = Long.parseLong(ret.substring(0,ret.indexOf(' ')));
 			String json = ret.substring(ret.indexOf(' ')+1);
 			
-			CheckinData[] retCheckin = gson.fromJson(json, CheckinData[].class); 
+			retCheckin = gson.fromJson(json, CheckinData[].class); 
 			
 			Database.getInstance(ConnectionService.this).addSyncedCheckinData(retCheckin);
 			Database.getInstance(ConnectionService.this).setMarksSynced(newTimestamp);
 			
 			TempStates.instance(this).setSyncTimetamp(newTimestamp);
 		}catch(SocketConnectException | NoInputStringException e){
-			e.printStackTrace();
+			throw e;
 		}finally{
 			tcp.disConnect();
 		}
+		return retCheckin==null?new CheckinData[0]:retCheckin;
 	}
 	
 	public class ConnectionServiceBinder extends Binder{
@@ -123,6 +129,8 @@ public class ConnectionService extends Service {
 
 			    		TempStates.instance(ConnectionService.this).setHost(ipAddress, port);
 						myhandler.sendEmptyMessage(0);
+						
+						sendBroadcast(new Intent(getString(R.string.broadcast_connected)));
 					} catch (SocketConnectException|NoInputStringException e) {
 						myhandler.sendEmptyMessage(1);
 					}finally{
@@ -135,10 +143,11 @@ public class ConnectionService extends Service {
     	public void startSync(){
     		mTimer.cancel();
     		mTimer = new Timer();
-    		mTimer.schedule(new MyTimerTask(), 0 , TempStates.instance(ConnectionService.this).severSettings.timer);
+    		mTimer.schedule(new MyTimerTask(), 5000 , TempStates.instance(ConnectionService.this).severSettings.timer);
     	}
     	public void stopSync(){
     		mTimer.cancel();
+			sendBroadcast(new Intent(getString(R.string.broadcast_disconnected)));
     		ConnectionService.this.stopSelf();
     	}
     	
@@ -168,20 +177,19 @@ public class ConnectionService extends Service {
 			}.start();
     	}
     	
-
     	public boolean checkin(String code) throws LogicException{
     		CodeDataReturn table = Database.getInstance(ConnectionService.this).getCodeInfo(code);
 			if(table==null) return false;
 			
     		String json = new Gson().toJson(table);
-    		boolean result = call(json);
+    		boolean result = callScript(json);
     		if(result) Database.getInstance(ConnectionService.this).checkin(table.id);
     		return result;
     	}
     }
 	
     private static final String preCheckin = "function pre(tmps) {var tmp = eval('(' + tmps + ')');return checkin(tmp);}";
-	private boolean call(String json) throws LogicException{
+	private boolean callScript(String json) throws LogicException{
 		try{
 			//TODO 预编译
 			Context rhino = Context.enter();
@@ -208,10 +216,28 @@ public class ConnectionService extends Service {
 	}
 	
 	private class MyTimerTask extends TimerTask{
+		DateFormat formater = new SimpleDateFormat("yy-MM-dd hh:mm:ss",Locale.getDefault());
 		@Override
 		public void run() {
-//			Log.i("log", new Date().toString());
-			syncCheckin();
+			try {
+				CheckinData[] checkin = Database.getInstance(ConnectionService.this).markUnsynced();
+				Intent intent = new Intent(getString(R.string.broadcast_sync_start));
+				intent.putExtra("checkinNum", checkin.length);
+				sendBroadcast(intent);
+				
+				CheckinData[] retCheckin = syncCheckin(checkin);
+				Intent intent2 = new Intent(getString(R.string.broadcast_sync_end));
+				String dateStr = formater.format(new Date());
+				
+				intent2.putExtra("syncTime", dateStr);
+				intent2.putExtra("uploadNum", checkin.length);
+				intent2.putExtra("downloadNum", retCheckin.length);
+				sendBroadcast(intent2);
+			} catch (Exception e) {
+				Intent intent = new Intent(getString(R.string.broadcast_sync_error));
+				intent.putExtra("errorInfo", e.getMessage());
+				sendBroadcast(intent);
+			}
 		}
 	}
 }

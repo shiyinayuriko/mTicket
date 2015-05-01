@@ -28,6 +28,15 @@
             </intent-filter>
         </activity>
         <service android:name=".ConnectionService"></service>
+        
+        <receiver android:name=".NotificationReceiver">
+            <intent-filter><action android:name="net.whitecomet.mticket.test"/></intent-filter>
+            <intent-filter><action android:name="net.whitecomet.mticket.connected"/></intent-filter>
+            <intent-filter><action android:name="net.whitecomet.mticket.disconnected"/></intent-filter>
+            <intent-filter><action android:name="net.whitecomet.mticket.sync_error"/></intent-filter>
+            <intent-filter><action android:name="net.whitecomet.mticket.sync_start"/></intent-filter>
+            <intent-filter><action android:name="net.whitecomet.mticket.sync_end"/></intent-filter>
+            </receiver>
     </application>
 
 </manifest>

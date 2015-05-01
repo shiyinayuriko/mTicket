@@ -261,11 +261,17 @@ public class MainActivity extends ActionBarActivity {
 	}
 	public void test2(View view){
 		int id = new Random().nextInt(20000)+1;
-		try {
-			connectionBinder.checkin("123ZUKOJ320cDUub");
-		} catch (LogicException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+//		try {
+//			connectionBinder.checkin("123ZUKOJ320cDUub");
+//		} catch (LogicException e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//		}
+		
+		Database.getInstance(this).checkin(id);
+		AlertDialog.Builder builder = new AlertDialog.Builder(this);
+		builder.setTitle("checkin");
+		builder.setMessage(id+"");
+		builder.show();
 	}
 }
