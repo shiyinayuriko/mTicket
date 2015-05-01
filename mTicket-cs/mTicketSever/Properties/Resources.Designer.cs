@@ -59,5 +59,18 @@ namespace mTicket.Properties {
                 resourceCulture = value;
             }
         }
+        
+        /// <summary>
+        ///   查找类似 function checkin(tmp){
+        ///	if(tmp.checkin.length&gt;0) return false;
+        ///	else return true;
+        ///}
+        /// 的本地化字符串。
+        /// </summary>
+        internal static string checkinLogic {
+            get {
+                return ResourceManager.GetString("checkinLogic", resourceCulture);
+            }
+        }
     }
 }

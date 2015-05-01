@@ -1,6 +1,9 @@
 package net.whitecomet.mticket;
 
+import java.util.Random;
+
 import net.whitecomet.mticket.ConnectionService.ConnectionServiceBinder;
+import net.whitecomet.mticket.ConnectionService.LogicException;
 import net.whitecomet.mticket.data.Database;
 import net.whitecomet.mticket.data.TempStates;
 import android.support.v7.app.ActionBarActivity;
@@ -41,6 +44,11 @@ public class MainActivity extends ActionBarActivity {
 		super.onDestroy();
 	}
 
+	@Override
+	public void onBackPressed() {
+		moveTaskToBack(true);
+	}
+	
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		getMenuInflater().inflate(R.menu.main, menu);
@@ -88,13 +96,12 @@ public class MainActivity extends ActionBarActivity {
 		final CharSequence strDialogBody = getString(R.string.ProgressDialog_search_content);
 		final ProgressDialog myDialog = ProgressDialog.show(this,
 				strDialogTitle, strDialogBody, true);
-
+		myDialog.setCancelable(false);
 		connectionBinder.searchHost(port, new Handler() {
 			@Override
 			public void handleMessage(Message msg) {
 				myDialog.dismiss();
-				AlertDialog.Builder builder = new AlertDialog.Builder(
-						MainActivity.this);
+				AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
 				builder.setTitle(getString(R.string.AlertDialog_searchResult_title_failure));
 				builder.setNeutralButton(getString(R.string.close), null);
 
@@ -102,9 +109,7 @@ public class MainActivity extends ActionBarActivity {
 				case 0:
 					String ip = msg.getData().getString("ip");
 					int port = msg.getData().getInt("port");
-					String str = String
-							.format(getString(R.string.AlertDialog_searchResult_content_0),
-									ip, port);
+					String str = String.format(getString(R.string.AlertDialog_searchResult_content_0), ip, port);
 					builder.setMessage(str);
 					builder.setTitle(getString(R.string.AlertDialog_searchResult_title_success));
 					editTextIpAddress.setText(ip);
@@ -140,14 +145,14 @@ public class MainActivity extends ActionBarActivity {
 
 		final CharSequence strDialogTitle = getString(R.string.ProgressDialog_wait_title);
 		final CharSequence strDialogBody = getString(R.string.ProgressDialog_connect_content);
-		final ProgressDialog myDialog = ProgressDialog.show(this,
-				strDialogTitle, strDialogBody, true);
-		
+		final ProgressDialog myDialog = ProgressDialog.show(this, strDialogTitle, strDialogBody, true);
+		myDialog.setCancelable(false);
 		connectionBinder.connectHost(ipAddress, port, new Handler() {
 			@Override
 			public void handleMessage(Message msg) {
 				myDialog.dismiss();
 				AlertDialog.Builder builder = new AlertDialog.Builder( MainActivity.this);
+				builder.setCancelable(false);
 				switch (msg.what) {
 				case 0:
 					editTextIpAddress.setEnabled(false);
@@ -163,19 +168,29 @@ public class MainActivity extends ActionBarActivity {
 					builder.setTitle(getString(R.string.AlertDialog_connectResult_title_success));
 					builder.setMessage(getString(R.string.AlertDialog_connectResult_content_0));
 					builder.setPositiveButton(getString(R.string.yes),new OnClickListener() {
-								@Override
-								public void onClick(DialogInterface dialog, int which) {
-									MainActivity.this.updateDatebase(view);
-								}
-							});
-					builder.setNegativeButton(getString(R.string.no), null);
+						@Override
+						public void onClick(DialogInterface dialog, int which) {
+							MainActivity.this.updateDatebase(view);
+						}
+					});
+					builder.setNegativeButton(getString(R.string.no), new OnClickListener() {
+						@Override
+						public void onClick(DialogInterface arg0, int arg1) {
+							connectionBinder.startSync();
+						}
+					});
+					
 					builder.show();
-					if(TempStates.instance(MainActivity.this).getDatabaseUpdateTime()!=0)
-						connectionBinder.startSync();
 					break;
 				case 1:
 					builder.setTitle(getString(R.string.AlertDialog_connectResult_title_failure));
 					builder.setMessage(getString(R.string.AlertDialog_connectResult_content_1));
+					builder.setNeutralButton(getString(R.string.close), null);
+					builder.show();
+					break;
+				case 2:
+					builder.setTitle(getString(R.string.AlertDialog_connectResult_title_failure));
+					builder.setMessage(getString(R.string.AlertDialog_connectResult_content_2));
 					builder.setNeutralButton(getString(R.string.close), null);
 					builder.show();
 					break;
@@ -205,13 +220,13 @@ public class MainActivity extends ActionBarActivity {
 		final CharSequence strDialogBody = getString(R.string.ProgressDialog_updateDatabase_content__0);
 
 		final ProgressDialog myDialog = new ProgressDialog(this);
+		myDialog.setCancelable(false);
 
 		myDialog.setTitle(strDialogTitle);
 		myDialog.setMessage(strDialogBody);
 		myDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
 		myDialog.setIndeterminate(false);
 		myDialog.show();
-		connectionBinder.stopSync();
 		connectionBinder.updateDatebase(new Handler() {
 			@Override
 			public void handleMessage(Message msg) {
@@ -245,7 +260,12 @@ public class MainActivity extends ActionBarActivity {
 		//TODO
 	}
 	public void test2(View view){
-		
-		Database.getInstance(this).checkin(123);
+		int id = new Random().nextInt(20000)+1;
+		try {
+			connectionBinder.checkin("123ZUKOJ320cDUub");
+		} catch (LogicException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 }

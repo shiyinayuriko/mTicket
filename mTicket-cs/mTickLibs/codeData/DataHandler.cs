@@ -108,6 +108,7 @@ namespace mTicket
                     string name = reader.GetString(1);
                     table.columns[index] = name;
                 }
+                reader.Close();
             }
 
             using (SQLiteCommand cmd = new SQLiteCommand(_conn))
@@ -136,6 +137,7 @@ namespace mTicket
                     }
                     infos.Add(info);
                 }
+                reader.Close();
                 table.infos = infos.ToArray();
             }
             return table;
@@ -244,6 +246,7 @@ namespace mTicket
                     }
                     ret.Add(checkinData);
                 }
+                reader.Close();
             }
             return ret.ToArray();
         }

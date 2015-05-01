@@ -29,6 +29,7 @@
 	<string name="AlertDialog_connectResult_title_failure">连接服务器失败</string>
 	<string name="AlertDialog_connectResult_title_success">连接服务器成功</string>
 	<string name="AlertDialog_connectResult_content_1">通信异常</string>
+	<string name="AlertDialog_connectResult_content_2">逻辑错误</string>
 	<string name="AlertDialog_connectResult_content_0">是否更新数据库</string>
 	
 	<string name="ProgressDialog_updateDatabase_content__0">数据库连接中</string>

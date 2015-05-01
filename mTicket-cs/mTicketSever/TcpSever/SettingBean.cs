@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Configuration;
+using System.IO;
 using System.Linq;
 using System.Text;
-
+using System.Text.RegularExpressions;
+using System.Windows.Forms;
 using Newtonsoft.Json;
 
 namespace mTicket
@@ -16,6 +18,7 @@ namespace mTicket
         public int timer;
         public int proress_step_update_database;
         public int tcp_timeout;
+        public string checkin_logic;
 
         public string GetJson()
         {
@@ -25,11 +28,24 @@ namespace mTicket
 
         public static SettingBean GetSettings()
         {
+            string tmp;
+            try
+            {
+                string path = ConfigurationManager.AppSettings["checkin_logic"];
+                StreamReader sr = new StreamReader(path, Encoding.Default);
+                tmp = sr.ReadToEnd();
+            }
+            catch (Exception e)
+            {
+                tmp = Properties.Resources.checkinLogic;
+            }
+            tmp = Regex.Replace(tmp, "[\r\n]", "");
             var ret = new SettingBean
             {
                 timer = Convert.ToInt32(ConfigurationManager.AppSettings["timer"]),
                 proress_step_update_database = Convert.ToInt32(ConfigurationManager.AppSettings["proress_step_update_database"]),
-                tcp_timeout = Convert.ToInt32(ConfigurationManager.AppSettings["tcp_timeout"])
+                tcp_timeout = Convert.ToInt32(ConfigurationManager.AppSettings["tcp_timeout"]),
+                checkin_logic = tmp
             };
             return ret;
         }

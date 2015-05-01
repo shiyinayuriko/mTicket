@@ -1,15 +1,19 @@
 package net.whitecomet.mticket;
 
-import java.util.Date;
 import java.util.Timer;
 import java.util.TimerTask;
+
+import org.mozilla.javascript.Context;
+import org.mozilla.javascript.Function;
+import org.mozilla.javascript.ScriptableObject;
 
 import com.google.gson.Gson;
 
 import net.whitecomet.mticket.data.Database;
+import net.whitecomet.mticket.data.Database.CodeDataReturn;
 import net.whitecomet.mticket.data.TempStates;
 import net.whitecomet.mticket.data.beans.CheckinData;
-import net.whitecomet.mticket.data.beans.CodeTabel;
+import net.whitecomet.mticket.data.beans.CodeTable;
 import net.whitecomet.mticket.data.beans.SeverSettings;
 import net.whitecomet.mticket.tcpClient.NoInputStringException;
 import net.whitecomet.mticket.tcpClient.NotWifiException;
@@ -22,7 +26,6 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Message;
-import android.util.Log;
 
 public class ConnectionService extends Service {
 	private TCPClient tcp;
@@ -117,8 +120,8 @@ public class ConnectionService extends Service {
 						tcp.connect();
 						String json = tcp.call("connect");
 						TempStates.instance(ConnectionService.this).severSettings = new Gson().fromJson(json.trim(), SeverSettings.class);
-						
-						TempStates.instance(ConnectionService.this).setHost(ipAddress, port);
+
+			    		TempStates.instance(ConnectionService.this).setHost(ipAddress, port);
 						myhandler.sendEmptyMessage(0);
 					} catch (SocketConnectException|NoInputStringException e) {
 						myhandler.sendEmptyMessage(1);
@@ -149,11 +152,13 @@ public class ConnectionService extends Service {
 						myhandler.sendEmptyMessage(-1);
 						String json = tcp.call("codeTable");
 						myhandler.sendEmptyMessage(-2);
-						CodeTabel table = new Gson().fromJson(json.trim(), CodeTabel.class);
+						CodeTable table = new Gson().fromJson(json.trim(), CodeTable.class);
 						myhandler.sendEmptyMessage(-3);
 						Database.getInstance(ConnectionService.this).initializeCodeTable(table,myhandler);
 						myhandler.sendEmptyMessage(0);
+						
 						TempStates.instance(ConnectionService.this).setDatabaseUpdateTime(System.currentTimeMillis());
+						TempStates.instance(ConnectionService.this).setSyncTimetamp(0);
 					}catch(SocketConnectException | NoInputStringException e){
 						myhandler.sendEmptyMessage(1);
 					}finally{
@@ -163,7 +168,44 @@ public class ConnectionService extends Service {
 			}.start();
     	}
     	
+
+    	public boolean checkin(String code) throws LogicException{
+    		CodeDataReturn table = Database.getInstance(ConnectionService.this).getCodeInfo(code);
+			if(table==null) return false;
+			
+    		String json = new Gson().toJson(table);
+    		boolean result = call(json);
+    		if(result) Database.getInstance(ConnectionService.this).checkin(table.id);
+    		return result;
+    	}
     }
+	
+    private static final String preCheckin = "function pre(tmps) {var tmp = eval('(' + tmps + ')');return checkin(tmp);}";
+	private boolean call(String json) throws LogicException{
+		try{
+			//TODO 预编译
+			Context rhino = Context.enter();
+	        rhino.setOptimizationLevel(-1);
+	        ScriptableObject scope = rhino.initStandardObjects();
+
+	        rhino.evaluateString(scope,TempStates.instance(ConnectionService.this).severSettings.checkin_logic, "funtionCheckin", 0, null);
+	        Function function = rhino.compileFunction(scope, preCheckin, "preCheckin", 1, null);	
+			
+	        Object result = function.call(rhino, scope, scope,  new Object[]{json});
+	        Context.exit();
+          
+			return (boolean)result;
+		}catch(Exception e){
+	    	throw new LogicException(e);
+	    }
+	}
+	
+	public static class LogicException extends Exception{
+		private static final long serialVersionUID = -5568686964034679631L;
+		public LogicException(Exception e) {
+			super(e);
+		}
+	}
 	
 	private class MyTimerTask extends TimerTask{
 		@Override

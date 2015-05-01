@@ -1,10 +1,13 @@
 package net.whitecomet.mticket.data;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import net.whitecomet.mticket.data.beans.CheckinData;
 import net.whitecomet.mticket.data.beans.CodeInfo;
-import net.whitecomet.mticket.data.beans.CodeTabel;
+import net.whitecomet.mticket.data.beans.CodeTable;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
@@ -13,6 +16,7 @@ import android.database.sqlite.SQLiteOpenHelper;
 import android.database.sqlite.SQLiteStatement;
 import android.os.Handler;
 import android.os.Message;
+import android.provider.SyncStateContract.Columns;
 
 public class Database extends SQLiteOpenHelper {
 	public static final String dataBaseName = "coding.db";
@@ -41,7 +45,7 @@ public class Database extends SQLiteOpenHelper {
 		// TODO Auto-generated method stub
 	}
 	
-	public void initializeCodeTable(CodeTabel table,Handler handler) {
+	public void initializeCodeTable(CodeTable table,Handler handler) {
 		db.execSQL("DROP TABLE IF EXISTS " + codeTableName);
 		db.execSQL("DROP TABLE IF EXISTS " + codeInfoTableName);
 		db.execSQL("DROP TABLE IF EXISTS " + codeInfoColumnTableName);
@@ -60,10 +64,6 @@ public class Database extends SQLiteOpenHelper {
 			values.put("column_name", columns[i]);
 			db.insert(codeInfoColumnTableName, null, values);
 		}
-		ContentValues values = new ContentValues();
-		values.put("column_index", -1);
-		values.put("column_name", columns.length);
-		db.insert(codeInfoColumnTableName, null, values);
 
 		sql = "CREATE TABLE " + codeTableName + " (_ID INTEGER PRIMARY KEY,id INTEGER,code TEXT );";
 		db.execSQL(sql);
@@ -111,6 +111,8 @@ public class Database extends SQLiteOpenHelper {
 
 		sql = "CREATE TABLE " + checkinTableName + " (_ID INTEGER PRIMARY KEY,id INTEGER,checkin_time TIME,sync_time timestamp);";
 		db.execSQL(sql);
+		
+		columns = null;
 	}
 
 	@Override
@@ -137,6 +139,7 @@ public class Database extends SQLiteOpenHelper {
 			checkinData.checkin_time = c.getString(c.getColumnIndex("checkin_time"));
 			list.add(checkinData);
 		}
+		c.close();
 		return list.toArray(new CheckinData[0]);
 	}
 	public void setMarksSynced(long timestamp){
@@ -157,5 +160,57 @@ public class Database extends SQLiteOpenHelper {
 		}
 		db.setTransactionSuccessful();
 		db.endTransaction();
+	}
+
+	private String[] columns = null;
+	public CodeDataReturn getCodeInfo(String code){
+		if(columns == null){
+			Cursor c = db.query(codeInfoColumnTableName,null,null,null,null,null,null);
+			String[] columnsTmp = new String[c.getCount()];
+			while(c.moveToNext()){
+				columnsTmp[c.getInt(c.getColumnIndex("column_index"))] =  c.getString(c.getColumnIndex("column_name"));
+			}
+			c.close();
+			columns = columnsTmp;
+		}
+
+		Cursor ci = db.query(codeTableName,null,"code=?",new String[]{code},null,null,null,1+"");
+		if(ci.moveToFirst()){
+			CodeDataReturn ret = new CodeDataReturn();
+			ret.id = ci.getInt(ci.getColumnIndex("id"));
+			ret.code = ci.getString(ci.getColumnIndex("code"));
+			ci.close();
+			
+			Cursor cin = db.query(codeInfoTableName, null, "id = ?", new String[]{ret.id+""}, null, null, null,1+"");
+			ret.info = new HashMap<String, String>();
+			cin.moveToFirst();
+			for(int i=0;i<columns.length;i++){
+				String value = cin.getString(cin.getColumnIndex("arg"+i));
+				ret.info.put(columns[i], value);
+			}
+			cin.close();
+			
+			Cursor cck = db.query(checkinTableName, null, "id = ?", new String[]{ret.id+""}, null, null, null);
+			ret.checkin = new ArrayList<CheckinData>();
+			while(cck.moveToNext()){
+				CheckinData checkin = new CheckinData();
+				checkin.id = cck.getInt(cck.getColumnIndex("id"));
+				checkin.checkin_time = cck.getString(cck.getColumnIndex("checkin_time"));
+				ret.checkin.add(checkin);
+			}
+			cck.close();
+			
+			return ret;
+		}else {
+			ci.close();
+			return null;
+		}
+	}
+	
+	public static class CodeDataReturn{
+		public Map<String,String> info;
+		public List<CheckinData> checkin;
+		public int id;
+		public String code;
 	}
 }

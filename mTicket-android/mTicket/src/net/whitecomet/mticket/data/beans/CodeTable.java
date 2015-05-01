@@ -1,6 +1,6 @@
 package net.whitecomet.mticket.data.beans;
 
-public class CodeTabel {
+public class CodeTable {
 	public String[] columns;
 	public CodeInfo[] infos;
 }
