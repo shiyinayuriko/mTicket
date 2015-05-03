@@ -63,7 +63,7 @@ final class BeepManager implements MediaPlayer.OnCompletionListener,
 		SharedPreferences prefs = PreferenceManager
 				.getDefaultSharedPreferences(activity);
 		playBeep = shouldBeep(prefs, activity);
-		vibrate = prefs.getBoolean(Config.KEY_VIBRATE, false);
+		vibrate = prefs.getBoolean(Config.KEY_VIBRATE, true);
 		if (playBeep && mediaPlayer == null) {
 			// The volume on STREAM_SYSTEM is not adjustable, and users found it
 			// too loud,

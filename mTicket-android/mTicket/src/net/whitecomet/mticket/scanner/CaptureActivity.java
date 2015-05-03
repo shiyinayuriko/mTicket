@@ -7,14 +7,13 @@ import java.util.Map;
 
 import android.app.Activity;
 import android.app.AlertDialog;
-import android.app.ProgressDialog;
+import android.content.DialogInterface;
+import android.content.DialogInterface.OnClickListener;
 import android.content.Intent;
-import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
-import android.provider.MediaStore;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.SurfaceHolder;
@@ -22,11 +21,16 @@ import android.view.SurfaceView;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
+import android.widget.TextView;
 import android.widget.Toast;
+import net.whitecomet.mticket.MainActivity;
 import net.whitecomet.mticket.R;
+import net.whitecomet.mticket.data.Database;
+import net.whitecomet.mticket.data.beans.CheckinData;
+import net.whitecomet.mticket.data.beans.CodeDataReturn;
+import net.whitecomet.mticket.logic.LogicChecker;
+import net.whitecomet.mticket.logic.LogicException;
 import net.whitecomet.mticket.scanner.camera.CameraManager;
-import net.whitecomet.mticket.scanner.common.BitmapUtils;
-import net.whitecomet.mticket.scanner.decode.BitmapDecoder;
 import net.whitecomet.mticket.scanner.decode.CaptureActivityHandler;
 import net.whitecomet.mticket.scanner.view.ViewfinderView;
 
@@ -48,7 +52,7 @@ import com.google.zxing.client.result.ResultParser;
  * @author Sean Owen
  */
 public final class CaptureActivity extends Activity implements
-		SurfaceHolder.Callback, View.OnClickListener {
+		SurfaceHolder.Callback{
 
 	private static final String TAG = CaptureActivity.class.getSimpleName();
 
@@ -117,13 +121,6 @@ public final class CaptureActivity extends Activity implements
 
 	private IntentSource source;
 
-	/**
-	 * 图片的路径
-	 */
-	private String photoPath;
-
-	private Handler mHandler = new MyHandler(this);
-
 	static class MyHandler extends Handler {
 
 		private WeakReference<Activity> activityReference;
@@ -162,18 +159,15 @@ public final class CaptureActivity extends Activity implements
 
 		Window window = getWindow();
 		window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
-		setContentView(R.layout.capture);
+		setContentView(R.layout.activity_capture);
 
 		hasSurface = false;
 		inactivityTimer = new InactivityTimer(this);
 		beepManager = new BeepManager(this);
 		ambientLightManager = new AmbientLightManager(this);
-
-		// 监听图片识别按钮
-		findViewById(R.id.capture_scan_photo).setOnClickListener(this);
-
-		findViewById(R.id.capture_flashlight).setOnClickListener(this);
-
+		//TODO I modify here
+		bottom_detail = (TextView) findViewById(R.id.capture_bottom_detail);
+		logicChecker = new LogicChecker(this);
 	}
 
 	@Override
@@ -287,65 +281,6 @@ public final class CaptureActivity extends Activity implements
 	}
 
 	@Override
-	public void onActivityResult(int requestCode, int resultCode, Intent intent) {
-
-		if (resultCode == RESULT_OK) {
-			final ProgressDialog progressDialog;
-			switch (requestCode) {
-				case REQUEST_CODE:
-
-					// 获取选中图片的路径
-					Cursor cursor = getContentResolver().query(
-							intent.getData(), null, null, null, null);
-					if (cursor.moveToFirst()) {
-						photoPath = cursor.getString(cursor
-								.getColumnIndex(MediaStore.Images.Media.DATA));
-					}
-					cursor.close();
-
-					progressDialog = new ProgressDialog(this);
-					progressDialog.setMessage("正在扫描...");
-					progressDialog.setCancelable(false);
-					progressDialog.show();
-
-					new Thread(new Runnable() {
-
-						@Override
-						public void run() {
-
-							Bitmap img = BitmapUtils
-									.getCompressedBitmap(photoPath);
-
-							BitmapDecoder decoder = new BitmapDecoder(
-									CaptureActivity.this);
-							Result result = decoder.getRawResult(img);
-
-							if (result != null) {
-								Message m = mHandler.obtainMessage();
-								m.what = PARSE_BARCODE_SUC;
-								m.obj = ResultParser.parseResult(result)
-										.toString();
-								mHandler.sendMessage(m);
-							}
-							else {
-								Message m = mHandler.obtainMessage();
-								m.what = PARSE_BARCODE_FAIL;
-								mHandler.sendMessage(m);
-							}
-
-							progressDialog.dismiss();
-
-						}
-					}).start();
-
-					break;
-
-			}
-		}
-
-	}
-
-	@Override
 	public void surfaceCreated(SurfaceHolder holder) {
 		if (holder == null) {
 			Log.e(TAG,
@@ -368,36 +303,7 @@ public final class CaptureActivity extends Activity implements
 
 	}
 
-	/**
-	 * A valid barcode has been found, so give an indication of success and show
-	 * the results.
-	 * 
-	 * @param rawResult
-	 *            The contents of the barcode.
-	 * @param scaleFactor
-	 *            amount by which thumbnail was scaled
-	 * @param barcode
-	 *            A greyscale bitmap of the camera data which was decoded.
-	 */
-	public void handleDecode(Result rawResult, Bitmap barcode, float scaleFactor) {
-
-		// 重新计时
-		inactivityTimer.onActivity();
-
-		lastResult = rawResult;
-
-		// 把图片画到扫描框
-		viewfinderView.drawResultBitmap(barcode);
-
-		beepManager.playBeepSoundAndVibrate();
-
-		Toast.makeText(this,
-				"识别结果:" + ResultParser.parseResult(rawResult).toString(),
-				Toast.LENGTH_SHORT).show();
-
-	}
-
-	public void restartPreviewAfterDelay(long delayMS) {
+	private void restartPreviewAfterDelay(long delayMS) {
 		if (handler != null) {
 			handler.sendEmptyMessageDelayed(R.id.restart_preview, delayMS);
 		}
@@ -484,38 +390,114 @@ public final class CaptureActivity extends Activity implements
 	private void displayFrameworkBugMessageAndExit() {
 		AlertDialog.Builder builder = new AlertDialog.Builder(this);
 		builder.setTitle(getString(R.string.app_name));
-		builder.setMessage(getString(R.string.msg_camera_framework_bug));
-		builder.setPositiveButton(R.string.button_ok, new FinishListener(this));
+		builder.setMessage(getString(R.string.capture_msg_camera_framework_bug));
+		builder.setPositiveButton(R.string.close, new FinishListener(this));
 		builder.setOnCancelListener(new FinishListener(this));
 		builder.show();
 	}
-
-	@Override
-	public void onClick(View v) {
-		switch (v.getId()) {
-			case R.id.capture_scan_photo: // 图片识别
-				// 打开手机中的相册
-				Intent innerIntent = new Intent(Intent.ACTION_GET_CONTENT); // "android.intent.action.GET_CONTENT"
-				innerIntent.setType("image/*");
-				Intent wrapperIntent = Intent.createChooser(innerIntent,
-						"选择二维码图片");
-				this.startActivityForResult(wrapperIntent, REQUEST_CODE);
-				break;
-
-			case R.id.capture_flashlight:
-				if (isFlashlightOpen) {
-					cameraManager.setTorch(false); // 关闭闪光灯
-					isFlashlightOpen = false;
-				}
-				else {
-					cameraManager.setTorch(true); // 打开闪光灯
-					isFlashlightOpen = true;
-				}
-				break;
-			default:
-				break;
+	
+	public void onClickBack(View v){
+		finish();
+	}
+	public void onClickFlashlight(View v){
+		if (isFlashlightOpen) {
+			cameraManager.setTorch(false); // 关闭闪光灯
+			isFlashlightOpen = false;
 		}
+		else {
+			cameraManager.setTorch(true); // 打开闪光灯
+			isFlashlightOpen = true;
+		}
+	}
+	
+	/**
+	 * A valid barcode has been found, so give an indication of success and show
+	 * the results.
+	 * 
+	 * @param rawResult
+	 *            The contents of the barcode.
+	 * @param scaleFactor
+	 *            amount by which thumbnail was scaled
+	 * @param barcode
+	 *            A greyscale bitmap of the camera data which was decoded.
+	 */
+	public void handleDecode(Result rawResult, Bitmap barcode, float scaleFactor) {
+		//TODO I modify here
+		// 重新计时
+		inactivityTimer.onActivity();
 
+		lastResult = rawResult;
+
+		// 把图片画到扫描框
+		viewfinderView.drawResultBitmap(barcode);
+
+		beepManager.playBeepSoundAndVibrate();
+		
+		String code = rawResult.getText();
+		if(lastCheckCode!=null && lastCheckCode.equals(code)){
+			restartPreviewAfterDelay(100L);
+		}else{
+			checkin(code);
+			
+		}
 	}
 
+	private LogicChecker logicChecker = null;  
+	private TextView bottom_detail;
+	
+	private CodeDataReturn lastCheckCodeData = null ; 
+	private String lastCheckCode = null;
+	private void checkin(String code){
+		lastCheckCode = code;
+		
+		try {
+			CodeDataReturn codeData = Database.getInstance(this).getCodeInfo(code);
+			lastCheckCodeData = codeData;
+			bottom_detail.setText(codeData==null?code:codeData.toString());
+			boolean isPass = logicChecker.checkin(codeData);
+			if(isPass){
+				//TODO
+				restartPreviewAfterDelay(1000L);
+			}else{
+				AlertDialog.Builder builder = new AlertDialog.Builder(this);
+				builder.setTitle(getString(R.string.AlertDialog_checkResult_title_failure));
+				builder.setNeutralButton(getString(R.string.close), new OnClickListener() {
+					@Override
+					public void onClick(DialogInterface arg0, int arg1) {
+						restartPreviewAfterDelay(0L);
+					}
+				});
+				if(codeData==null)
+					builder.setMessage(getString(R.string.AlertDialog_checkResult_content_1));
+				else
+					builder.setMessage(getString(R.string.AlertDialog_checkResult_content_2));
+
+				builder.show();
+			}
+		} catch (LogicException e) {
+			AlertDialog.Builder builder = new AlertDialog.Builder(this);
+			builder.setTitle(getString(R.string.AlertDialog_checkResult_title_failure));
+			builder.setNeutralButton(getString(R.string.close), new OnClickListener() {
+				@Override
+				public void onClick(DialogInterface arg0, int arg1) {
+					restartPreviewAfterDelay(0L);
+				}
+			});
+			builder.setMessage(getString(R.string.AlertDialog_checkResult_content_3)+e.getMessage());
+			builder.show();
+		}
+	}
+	
+	public static final int REQUEST_DEFAULT = 0;
+	public static final int RESULT_DEFAULT = 0;
+	@Override
+	public void finish() {
+		Intent data=new Intent();
+		Bundle bundle = new Bundle();
+		bundle.putSerializable("lastCheckCodeData", lastCheckCodeData);
+		bundle.putString("lastCheckCode", lastCheckCode);
+		data.putExtras(bundle);
+		setResult(RESULT_OK, data);
+		super.finish();
+	}
 }

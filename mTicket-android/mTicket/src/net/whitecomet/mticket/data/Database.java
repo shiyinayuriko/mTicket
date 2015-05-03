@@ -2,10 +2,8 @@ package net.whitecomet.mticket.data;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import net.whitecomet.mticket.data.beans.CheckinData;
+import net.whitecomet.mticket.data.beans.CodeDataReturn;
 import net.whitecomet.mticket.data.beans.CodeInfo;
 import net.whitecomet.mticket.data.beans.CodeTable;
 import android.content.ContentValues;
@@ -16,7 +14,6 @@ import android.database.sqlite.SQLiteOpenHelper;
 import android.database.sqlite.SQLiteStatement;
 import android.os.Handler;
 import android.os.Message;
-import android.provider.SyncStateContract.Columns;
 
 public class Database extends SQLiteOpenHelper {
 	public static final String dataBaseName = "coding.db";
@@ -205,12 +202,5 @@ public class Database extends SQLiteOpenHelper {
 			ci.close();
 			return null;
 		}
-	}
-	
-	public static class CodeDataReturn{
-		public Map<String,String> info;
-		public List<CheckinData> checkin;
-		public int id;
-		public String code;
 	}
 }

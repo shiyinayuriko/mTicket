@@ -14,7 +14,9 @@
 	<string name="button_connect_host">连接服务器</string>
 	<string name="button_disconnect_host">断开服务器</string>
 	<string name="button_open_camera">打开手机摄像头</string>
-	
+	<string name="textview_checkCode_default">等待扫描</string>
+	<string name="textview_checkCodeData_default">无数据</string>
+		
 	
 	<string name="ProgressDialog_wait_title">请稍后</string>
 	
@@ -53,18 +55,13 @@
 	<string name="notification_sync_start_content">有%1$d条数据需要同步</string>
 	<string name="notification_sync_end_title">同步完成</string>
 	<string name="notification_sync_end_content">于%1$s 上传%2$d条 下载%3$d条 记录</string>
-		
 	
-    <string name="placeHolder">placeHolder</string>
-    <string name="seekbar_add">+</string>
-    <string name="seekbar_minus">-</string>
-    <string name="create">生成</string>
-    <string name="scan_failed">扫描失败</string>
-    <string name="bottom_hint">建议与镜头保持10CM距离，尽量避免逆光和阴影</string>
-    <string name="top_hint">将条形码或二维码置于取景框内系统会自动扫描</string>
-    <string name="cancel">取消</string>
-    <string name="msg_camera_framework_bug">抱歉，Android相机出现问题。您可能需要重启设备。</string>
-    <string name="button_ok">确定</string>
+    <string name="capture_bottom_detail">建议与镜头保持10CM距离，尽量避免逆光和阴影</string>
+    <string name="capture_top_hint">将条形码或二维码置于取景框内系统会自动扫描</string>
+    <string name="capture_msg_camera_framework_bug">抱歉，Android相机出现问题。您可能需要重启设备。</string>
 	
-	
+	<string name="AlertDialog_checkResult_title_failure">验证失败</string>
+	<string name="AlertDialog_checkResult_content_1">验证条件未通过:无此票号</string>
+	<string name="AlertDialog_checkResult_content_2">验证条件未通过:逻辑判断未通过</string>
+	<string name="AlertDialog_checkResult_content_3">发生异常:</string>
 </resources>

@@ -7,14 +7,9 @@ import java.util.Locale;
 import java.util.Timer;
 import java.util.TimerTask;
 
-import org.mozilla.javascript.Context;
-import org.mozilla.javascript.Function;
-import org.mozilla.javascript.ScriptableObject;
-
 import com.google.gson.Gson;
 
 import net.whitecomet.mticket.data.Database;
-import net.whitecomet.mticket.data.Database.CodeDataReturn;
 import net.whitecomet.mticket.data.TempStates;
 import net.whitecomet.mticket.data.beans.CheckinData;
 import net.whitecomet.mticket.data.beans.CodeTable;
@@ -176,44 +171,8 @@ public class ConnectionService extends Service {
 				};
 			}.start();
     	}
-    	
-    	public boolean checkin(String code) throws LogicException{
-    		CodeDataReturn table = Database.getInstance(ConnectionService.this).getCodeInfo(code);
-			if(table==null) return false;
-			
-    		String json = new Gson().toJson(table);
-    		boolean result = callScript(json);
-    		if(result) Database.getInstance(ConnectionService.this).checkin(table.id);
-    		return result;
-    	}
-    }
-	
-    private static final String preCheckin = "function pre(tmps) {var tmp = eval('(' + tmps + ')');return checkin(tmp);}";
-	private boolean callScript(String json) throws LogicException{
-		try{
-			//TODO 预编译
-			Context rhino = Context.enter();
-	        rhino.setOptimizationLevel(-1);
-	        ScriptableObject scope = rhino.initStandardObjects();
 
-	        rhino.evaluateString(scope,TempStates.instance(ConnectionService.this).severSettings.checkin_logic, "funtionCheckin", 0, null);
-	        Function function = rhino.compileFunction(scope, preCheckin, "preCheckin", 1, null);	
-			
-	        Object result = function.call(rhino, scope, scope,  new Object[]{json});
-	        Context.exit();
-          
-			return (boolean)result;
-		}catch(Exception e){
-	    	throw new LogicException(e);
-	    }
-	}
-	
-	public static class LogicException extends Exception{
-		private static final long serialVersionUID = -5568686964034679631L;
-		public LogicException(Exception e) {
-			super(e);
-		}
-	}
+    }
 	
 	private class MyTimerTask extends TimerTask{
 		DateFormat formater = new SimpleDateFormat("yy-MM-dd hh:mm:ss",Locale.getDefault());

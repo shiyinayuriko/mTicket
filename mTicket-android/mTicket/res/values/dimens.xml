@@ -1,7 +1,22 @@
 <resources>
 
     <!-- Default screen margins, per the Android Design guidelines. -->
-    <dimen name="activity_horizontal_margin">16dp</dimen>
-    <dimen name="activity_vertical_margin">16dp</dimen>
+    <dimen name="activity_main_horizontal_margin">16dp</dimen>
+    <dimen name="activity_main_vertical_margin">16dp</dimen>
 	<dimen name="host_info_input_text_size">15sp</dimen>
+	
+	<dimen name="activity_main_text_size">17sp</dimen>
+	
+	<dimen name="activity_capture_top_height">85.0dip</dimen>
+	<dimen name="activity_capture_top_text_height">85.0dip</dimen>
+	<dimen name="activity_capture_top_text_paddingLeft">10.0dip</dimen>
+	<dimen name="activity_capture_top_text_size">13sp</dimen>
+	<dimen name="activity_capture_top_imageButton_size">30.0dip</dimen>
+	
+	<dimen name="activity_capture_bottom_height">130.0dip</dimen>
+	<dimen name="activity_capture_bottom_ScrollView_vertical_padding">10dip</dimen>
+	<dimen name="activity_capture_bottom_ScrollView_horizontal_padding">3dip</dimen>
+	<dimen name="activity_capture_bottom_text_horizontal_padding">10dip</dimen>
+	<dimen name="activity_capture_bottom_text_size">15.0sp</dimen>
+	
 </resources>

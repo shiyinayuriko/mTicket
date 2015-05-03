@@ -1,11 +1,13 @@
 package net.whitecomet.mticket;
 
+import java.io.Serializable;
 import java.util.Random;
 
 import net.whitecomet.mticket.ConnectionService.ConnectionServiceBinder;
-import net.whitecomet.mticket.ConnectionService.LogicException;
 import net.whitecomet.mticket.data.Database;
 import net.whitecomet.mticket.data.TempStates;
+import net.whitecomet.mticket.data.beans.CheckinData;
+import net.whitecomet.mticket.data.beans.CodeDataReturn;
 import net.whitecomet.mticket.scanner.CaptureActivity;
 import android.support.v7.app.ActionBarActivity;
 import android.app.AlertDialog;
@@ -24,9 +26,13 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.TextView;
 
 public class MainActivity extends ActionBarActivity {
 
+	private TextView textLastCheckCode;
+	private TextView textLastCheckCodeData;
+	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -38,6 +44,9 @@ public class MainActivity extends ActionBarActivity {
 
 		editTextIpAddress.setText(tempStates.getIpaddress());
 		editTextPort.setText(tempStates.getPort() == null ? null : tempStates.getPort() + "");
+		
+		textLastCheckCode = (TextView) findViewById(R.id.text_lastCheckCode);
+		textLastCheckCodeData = (TextView) findViewById(R.id.text_lastCheckCodeData);
 	}
 
 	@Override
@@ -165,6 +174,7 @@ public class MainActivity extends ActionBarActivity {
 					disconnectButton.setEnabled(true);
 					disconnectButton.setVisibility(View.VISIBLE);
 					((Button) findViewById(R.id.button_search_host)).setEnabled(false);
+					((Button) findViewById(R.id.button_open_camera)).setEnabled(true);
 
 					builder.setTitle(getString(R.string.AlertDialog_connectResult_title_success));
 					builder.setMessage(getString(R.string.AlertDialog_connectResult_content_0));
@@ -258,17 +268,24 @@ public class MainActivity extends ActionBarActivity {
 	}
 	
 	public void openCamera(View view){
-		//TODO
-		startActivity(new Intent(this,CaptureActivity.class));
+		startActivityForResult(new Intent(this,CaptureActivity.class),CaptureActivity.REQUEST_DEFAULT);
 	}
+	
+
+	@Override
+	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+		CodeDataReturn lastCheckCodeData = (CodeDataReturn) data.getSerializableExtra("lastCheckCodeData");
+		String lastCheckCode = data.getStringExtra("lastCheckCode");
+		if(lastCheckCode!=null) textLastCheckCode.setText(lastCheckCode);
+		if(lastCheckCodeData!=null){
+			textLastCheckCodeData.setText(lastCheckCodeData.toString());
+		}else{
+			textLastCheckCodeData.setText(getString(R.string.textview_checkCodeData_default));
+		}
+	}
+	
 	public void test2(View view){
 		int id = new Random().nextInt(20000)+1;
-//		try {
-//			connectionBinder.checkin("123ZUKOJ320cDUub");
-//		} catch (LogicException e) {
-//			// TODO Auto-generated catch block
-//			e.printStackTrace();
-//		}
 		
 		Database.getInstance(this).checkin(id);
 		AlertDialog.Builder builder = new AlertDialog.Builder(this);
