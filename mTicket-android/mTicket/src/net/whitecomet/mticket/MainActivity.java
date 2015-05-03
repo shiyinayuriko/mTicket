@@ -6,6 +6,7 @@ import net.whitecomet.mticket.ConnectionService.ConnectionServiceBinder;
 import net.whitecomet.mticket.ConnectionService.LogicException;
 import net.whitecomet.mticket.data.Database;
 import net.whitecomet.mticket.data.TempStates;
+import net.whitecomet.mticket.scanner.CaptureActivity;
 import android.support.v7.app.ActionBarActivity;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
@@ -258,6 +259,7 @@ public class MainActivity extends ActionBarActivity {
 	
 	public void openCamera(View view){
 		//TODO
+		startActivity(new Intent(this,CaptureActivity.class));
 	}
 	public void test2(View view){
 		int id = new Random().nextInt(20000)+1;
