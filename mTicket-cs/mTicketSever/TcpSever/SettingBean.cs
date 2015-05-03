@@ -19,6 +19,7 @@ namespace mTicket
         public int proress_step_update_database;
         public int tcp_timeout;
         public string checkin_logic;
+        public long restart_scanner_delay;
 
         public string GetJson()
         {
@@ -45,6 +46,7 @@ namespace mTicket
                 timer = Convert.ToInt32(ConfigurationManager.AppSettings["timer"]),
                 proress_step_update_database = Convert.ToInt32(ConfigurationManager.AppSettings["proress_step_update_database"]),
                 tcp_timeout = Convert.ToInt32(ConfigurationManager.AppSettings["tcp_timeout"]),
+                restart_scanner_delay = Convert.ToInt64(ConfigurationManager.AppSettings["restart_scanner_delay"]),
                 checkin_logic = tmp
             };
             return ret;

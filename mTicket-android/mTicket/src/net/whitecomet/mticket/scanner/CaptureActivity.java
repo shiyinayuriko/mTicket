@@ -26,6 +26,7 @@ import android.widget.Toast;
 import net.whitecomet.mticket.MainActivity;
 import net.whitecomet.mticket.R;
 import net.whitecomet.mticket.data.Database;
+import net.whitecomet.mticket.data.TempStates;
 import net.whitecomet.mticket.data.beans.CheckinData;
 import net.whitecomet.mticket.data.beans.CodeDataReturn;
 import net.whitecomet.mticket.logic.LogicChecker;
@@ -456,8 +457,7 @@ public final class CaptureActivity extends Activity implements
 			bottom_detail.setText(codeData==null?code:codeData.toString());
 			boolean isPass = logicChecker.checkin(codeData);
 			if(isPass){
-				//TODO
-				restartPreviewAfterDelay(1000L);
+				restartPreviewAfterDelay(TempStates.instance(this).severSettings.restart_scanner_delay);
 			}else{
 				AlertDialog.Builder builder = new AlertDialog.Builder(this);
 				builder.setTitle(getString(R.string.AlertDialog_checkResult_title_failure));
