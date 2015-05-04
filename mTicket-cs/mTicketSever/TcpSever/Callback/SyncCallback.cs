@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Windows.Forms;
 using mTickLibs.codeData;
 using Newtonsoft.Json;
 
@@ -9,22 +10,14 @@ namespace mTicket
 {
     class SyncCallback : ICallback
     {
-        private Form1 form1;
-        private DataBaseHandler _db;
-        public SyncCallback(Form1 form1, DataBaseHandler db)
+        private readonly DataBaseHandler _db;
+        public SyncCallback(TextBox text_log, DataBaseHandler db) : base(text_log)
         {
-            this.form1 = form1;
             _db = db;
         }
 
-        public void UpdateLine(SocketBackEventArgs e)
+        public override string DealCommand(SocketBackEventArgs e)
         {
-            form1.textBox1.AppendText(DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss ms:::") + e.EndPoint + ":" +  e.ReciveData + Environment.NewLine);
-        }
-
-        public string DealCommand(SocketBackEventArgs e)
-        {
-            UpdateLine(e);
             var line = (string) e.ReciveData;
             string args = line.Substring(line.IndexOf(' ')+1);
             

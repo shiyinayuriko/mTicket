@@ -86,6 +86,7 @@
     <Compile Include="TcpSever\Callback\SyncCallback.cs" />
     <Compile Include="Beans\SettingBean.cs" />
     <Compile Include="Beans\SocketBackEventArgs.cs" />
+    <Compile Include="TcpSever\HostNameHolder.cs" />
     <Compile Include="TcpSever\TcpSever.cs" />
     <EmbeddedResource Include="Form1.resx">
       <DependentUpon>Form1.cs</DependentUpon>

@@ -19,12 +19,16 @@ import net.whitecomet.mticket.tcpClient.NotWifiException;
 import net.whitecomet.mticket.tcpClient.SocketConnectException;
 import net.whitecomet.mticket.tcpClient.TCPClient;
 import android.app.Service;
+import android.bluetooth.BluetoothAdapter;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Binder;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Message;
+import android.telephony.TelephonyManager;
 
 public class ConnectionService extends Service {
 	private TCPClient tcp;
@@ -119,7 +123,7 @@ public class ConnectionService extends Service {
     			public void run() {
     	    		try {
 						tcp.connect();
-						String json = tcp.call("connect");
+						String json = tcp.call("connect "+ConnectionServiceBinder.this.getName());
 						TempStates.instance(ConnectionService.this).severSettings = new Gson().fromJson(json.trim(), SeverSettings.class);
 
 			    		TempStates.instance(ConnectionService.this).setHost(ipAddress, port);
@@ -172,6 +176,12 @@ public class ConnectionService extends Service {
 			}.start();
     	}
 
+    	private String getName(){
+    		TelephonyManager tm = (TelephonyManager) getSystemService(Context.TELEPHONY_SERVICE);  
+            StringBuilder sb = new StringBuilder();  
+            sb.append(BluetoothAdapter.getDefaultAdapter().getName());
+    	        return sb.toString();
+    	}
     }
 	
 	private class MyTimerTask extends TimerTask{

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Windows.Forms;
 
 namespace mTicket
 {
@@ -9,18 +10,12 @@ namespace mTicket
     {
         private Form1 form1;
 
-        public SampleCallback(Form1 form1)
+        public SampleCallback(TextBox text_log) : base(text_log)
         {
-            this.form1 = form1;
-        }
-        public void UpdateLine(SocketBackEventArgs e)
-        {
-            form1.textBox1.AppendText(DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss ms:::") + e.EndPoint + ":" + e.ReciveData + Environment.NewLine);
         }
 
-        public string DealCommand(SocketBackEventArgs e)
+        public override string DealCommand(SocketBackEventArgs e)
         {
-            UpdateLine(e);
             return (string)e.ReciveData;
         }
     }

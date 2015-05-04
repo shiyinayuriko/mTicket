@@ -36,7 +36,7 @@ namespace mTicket
                 StreamReader sr = new StreamReader(path, Encoding.Default);
                 tmp = sr.ReadToEnd();
             }
-            catch (Exception e)
+            catch (Exception )
             {
                 tmp = Properties.Resources.checkinLogic;
             }

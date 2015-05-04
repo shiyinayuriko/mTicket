@@ -4,6 +4,7 @@ using System.ComponentModel;
 using System.Data;
 using System.Drawing;
 using System.Linq;
+using System.Net;
 using System.Text;
 using System.Windows.Forms;
 using mTickLibs.codeData;
@@ -16,6 +17,8 @@ namespace mTicket
         {
             InitializeComponent();
             CheckForIllegalCrossThreadCalls = false;
+
+            label_IpAddress_Content.Text = GetIp();
         }
 
         private string _dbFileName;
@@ -54,10 +57,10 @@ namespace mTicket
             DataBaseHandler db = DataHandler.getDataBaseHandler(_dbFileName);
 
             //            t.CallbackList.Add("aaa", new SampleCallback(this));
-            t.CallbackList.Add("ping", new PingCallback(this));
-            t.CallbackList.Add("connect", new ConnectCallback(this));
-            t.CallbackList.Add("codeTable", new CodeTableCallback(this, db));
-            t.CallbackList.Add("syncCheckin", new SyncCallback(this, db));
+            t.CallbackList.Add("ping", new PingCallback(text_log));
+            t.CallbackList.Add("connect", new ConnectCallback(text_log));
+            t.CallbackList.Add("codeTable", new CodeTableCallback(text_log, db));
+            t.CallbackList.Add("syncCheckin", new SyncCallback(text_log, db));
             t.StartListen();
             button_startListen.Enabled = false;
             button_Database_Browse.Enabled = false;
@@ -73,11 +76,21 @@ namespace mTicket
             Text_Port_Content.Text = newPort;
         }
 
-
-
         private void listView_checkin_SelectedIndexChanged(object sender, EventArgs e)
         {
 
+        }
+        private static string GetIp()   //获取本地IP
+        {
+            IPHostEntry IpEntry = System.Net.Dns.GetHostEntry(System.Net.Dns.GetHostName());
+            for (int i = 0; i != IpEntry.AddressList.Length; i++)
+            {
+                if (IpEntry.AddressList[i].AddressFamily == System.Net.Sockets.AddressFamily.InterNetwork)
+                {
+                    return IpEntry.AddressList[i].ToString();
+                }
+            }
+            return "未成功获取..";
         }
     }
 }
