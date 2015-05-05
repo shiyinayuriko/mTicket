@@ -1,10 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data.SQLite;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
 using System.Xml.Linq;
+using mTicket.Beans;
 using mTickLibs.codeData;
 using NPOI.HSSF.UserModel;
 using NPOI.SS.UserModel;
@@ -140,8 +142,95 @@ namespace mTicket
                 reader.Close();
                 table.infos = infos.ToArray();
             }
+            _columns = table.columns;
             return table;
         }
+
+        private string[] _columns;
+        public CodeDataDetail LoadCodeDataDetail(int id)
+        {
+            if (_columns == null)
+            {
+                int columnNum;
+                using (SQLiteCommand cmd = new SQLiteCommand(_conn))
+                {
+                    cmd.CommandText = "SELECT COUNT(*) FROM " + CodeInfoColumnTableName;
+                    columnNum = Int32.Parse(cmd.ExecuteScalar().ToString());
+                }
+                string[] columnsTmp = new string[columnNum];
+                using (SQLiteCommand cmd = new SQLiteCommand(_conn))
+                {
+                    cmd.CommandText = "SELECT * FROM " + CodeInfoColumnTableName;
+                    SQLiteDataReader reader = cmd.ExecuteReader();
+                    while (reader.Read())
+                    {
+                        int index = reader.GetInt32(0);
+                        string name = reader.GetString(1);
+                        columnsTmp[index] = name;
+                    }
+                    reader.Close();
+                }
+            }
+
+            CodeDataDetail detail = new CodeDataDetail();
+            using (SQLiteCommand cmd = new SQLiteCommand(_conn))
+            {
+                cmd.CommandText = string.Format("SELECT * FROM {0},{1} WHERE {0}._id = {1}._id AND {0}._id = {2}", CodeTableName, CodeInfoTableName,id);
+                SQLiteDataReader reader = cmd.ExecuteReader();
+
+                if(reader.Read())
+                {
+                    detail.info = new Dictionary<string, string>();
+
+                    for (var i = 0; i < reader.FieldCount; i++)
+                    {
+                        string filedName = reader.GetName(i);
+                        switch (filedName)
+                        {
+                            case "_id":
+                                var idTmp = reader.GetInt32(i);
+                                detail.id = idTmp;
+                                break;
+                            case "code":
+                                var code = reader.GetString(i);
+                                detail.code = code;
+                                break;
+                            default:
+                                int argn = Convert.ToInt32(filedName.Substring(3));
+                                Debug.Assert(_columns != null, "_columns != null");
+                                detail.info.Add(_columns[argn]+"", reader.GetString(i));
+                                break;
+                        }
+                    }
+                }
+            }
+            using (SQLiteCommand cmd = new SQLiteCommand(_conn))
+            {
+                cmd.CommandText = "SELECT * FROM " + CheckinTableName + " WHERE _id=" + id;
+                SQLiteDataReader reader = cmd.ExecuteReader();
+                List<CheckinData> tmpList = new List<CheckinData>();
+                while (reader.Read())
+                {
+                    CheckinData checkinData = new CheckinData();
+                    for (var i = 0; i < reader.FieldCount; i++)
+                    {
+                        string filedName = reader.GetName(i);
+                        switch (filedName)
+                        {
+                            case "_id": checkinData.id = reader.GetInt32(i); break;
+                            case "checkin_time":
+                                checkinData.checkin_time = reader.GetString(i); break;
+                            case "sync_time": checkinData.sync_time = reader.GetInt64(i); break;
+                        }
+                    }
+                    tmpList.Add(checkinData);
+                }
+                reader.Close();
+                detail.checkin = tmpList.ToArray();
+            }
+            return detail;
+        }
+
         public static void SaveCodeTable(CodeTable codeTable, string path)
         {
             SQLiteConnection.CreateFile(path);

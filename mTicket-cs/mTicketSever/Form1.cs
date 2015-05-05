@@ -7,6 +7,7 @@ using System.Linq;
 using System.Net;
 using System.Text;
 using System.Windows.Forms;
+using mTicket.Beans;
 using mTickLibs.codeData;
 
 namespace mTicket
@@ -46,21 +47,21 @@ namespace mTicket
         {
             label_Database_Content.Text = _dbFileName;
             button_startListen.Enabled = true;
+            _db = DataHandler.getDataBaseHandler(_dbFileName);
         }
 
-        
-        
+
+        private DataBaseHandler _db;
         private void button_startListen_onClick(object sender, EventArgs e)
         {
             var t = new TcpSever { Port = Convert.ToInt32(Text_Port_Content.Text) };
 
-            DataBaseHandler db = DataHandler.getDataBaseHandler(_dbFileName);
 
             //            t.CallbackList.Add("aaa", new SampleCallback(this));
             t.CallbackList.Add("ping", new PingCallback(text_log));
             t.CallbackList.Add("connect", new ConnectCallback(text_log));
-            t.CallbackList.Add("codeTable", new CodeTableCallback(text_log, db));
-            t.CallbackList.Add("syncCheckin", new SyncCallback(text_log, db));
+            t.CallbackList.Add("codeTable", new CodeTableCallback(text_log, _db));
+            t.CallbackList.Add("syncCheckin", new SyncCallback(text_log, listView_checkin, _db));
             t.StartListen();
             button_startListen.Enabled = false;
             button_Database_Browse.Enabled = false;
@@ -78,7 +79,22 @@ namespace mTicket
 
         private void listView_checkin_SelectedIndexChanged(object sender, EventArgs e)
         {
-
+            if (listView_checkin.SelectedItems.Count == 0) return;
+            int id = Convert.ToInt32(listView_checkin.SelectedItems[0].SubItems[0].Text);
+            CodeDataDetail codeTable = _db.LoadCodeDataDetail(id);
+            listView_info.Items.Clear();
+            foreach (var pair in codeTable.info)
+            {
+                var record = new ListViewItem(pair.Key);
+                record.SubItems.Add(pair.Value);
+                listView_info.Items.Add(record);
+            }
+            for (var i=0;i<codeTable.checkin.Length;i++)
+            {
+                var record = new ListViewItem("进出记录-"+(i+1));
+                record.SubItems.Add(codeTable.checkin[i].checkin_time);
+                listView_info.Items.Add(record);
+            }
         }
         private static string GetIp()   //获取本地IP
         {

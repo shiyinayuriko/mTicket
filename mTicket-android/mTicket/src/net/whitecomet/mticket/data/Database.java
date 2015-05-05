@@ -118,7 +118,7 @@ public class Database extends SQLiteOpenHelper {
 	}
 
 	public void checkin(int id){
-		String sql = "insert into " + checkinTableName + " (id, checkin_time) values("+id+", datetime('now'))";
+		String sql = "insert into " + checkinTableName + " (id, checkin_time) values("+id+", datetime('now', 'localtime'))";
 		db.execSQL(sql);
 	}
 	

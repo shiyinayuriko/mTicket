@@ -12,9 +12,20 @@ namespace mTicket
     class SyncCallback : ICallback
     {
         private readonly DataBaseHandler _db;
-        public SyncCallback(TextBox text_log, DataBaseHandler db) : base(text_log)
+        private ListView _liseview ;
+        public SyncCallback(TextBox text_log, ListView liseview, DataBaseHandler db) : base(text_log)
         {
             _db = db;
+            _liseview = liseview;
+            CheckinData[] checkins = _db.GetCheckinDatas(0);
+            foreach (var checkin in checkins)
+            {
+                var record = new ListViewItem(checkin.id + "");
+                record.SubItems.Add(checkin.checkin_time);
+                record.SubItems.Add("default");
+                record.SubItems.Add(checkin.sync_time+"");
+                _liseview.Items.Add(record);
+            }
         }
 
         protected override string OnDealCommand(string commandStr, string[] commandParams, string endPointName, IPEndPoint endPoint)
@@ -23,7 +34,17 @@ namespace mTicket
             CheckinData[] retCheckin = _db.GetCheckinDatas(timestamp);
 
             string json = commandParams[1].Trim();
-            long newTimestamp = _db.SetCheckinDatas(JsonConvert.DeserializeObject<CheckinData[]>(json),endPointName);
+            CheckinData[] checkins = JsonConvert.DeserializeObject<CheckinData[]>(json);
+            long newTimestamp = _db.SetCheckinDatas(checkins, endPointName);
+
+            foreach (var checkin in checkins)
+            {
+                var record = new ListViewItem(checkin.id + "");
+                record.SubItems.Add(checkin.checkin_time);
+                record.SubItems.Add(endPointName);
+                record.SubItems.Add(timestamp+"");
+                _liseview.Items.Add(record);
+            }
 
             return (newTimestamp+1) +" " + JsonConvert.SerializeObject(retCheckin);
         }

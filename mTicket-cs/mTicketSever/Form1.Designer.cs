@@ -35,8 +35,9 @@
             this.splitContainer1 = new System.Windows.Forms.SplitContainer();
             this.listView_checkin = new System.Windows.Forms.ListView();
             this.id = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
-            this.code = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.time = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.from = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.syncTime = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.listView_info = new System.Windows.Forms.ListView();
             this.Key = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.value = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
@@ -82,7 +83,7 @@
             this.text_log.Name = "text_log";
             this.text_log.ReadOnly = true;
             this.text_log.ScrollBars = System.Windows.Forms.ScrollBars.Both;
-            this.text_log.Size = new System.Drawing.Size(722, 564);
+            this.text_log.Size = new System.Drawing.Size(680, 558);
             this.text_log.TabIndex = 1;
             // 
             // tabControl
@@ -95,7 +96,7 @@
             this.tabControl.Location = new System.Drawing.Point(12, 12);
             this.tabControl.Name = "tabControl";
             this.tabControl.SelectedIndex = 0;
-            this.tabControl.Size = new System.Drawing.Size(742, 602);
+            this.tabControl.Size = new System.Drawing.Size(773, 597);
             this.tabControl.TabIndex = 2;
             // 
             // tabPage_main
@@ -105,13 +106,16 @@
             this.tabPage_main.Location = new System.Drawing.Point(4, 22);
             this.tabPage_main.Name = "tabPage_main";
             this.tabPage_main.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage_main.Size = new System.Drawing.Size(734, 576);
+            this.tabPage_main.Size = new System.Drawing.Size(765, 571);
             this.tabPage_main.TabIndex = 0;
             this.tabPage_main.Text = "启动";
             this.tabPage_main.UseVisualStyleBackColor = true;
             // 
             // splitContainer1
             // 
+            this.splitContainer1.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.splitContainer1.Location = new System.Drawing.Point(320, 6);
             this.splitContainer1.Name = "splitContainer1";
             this.splitContainer1.Orientation = System.Windows.Forms.Orientation.Horizontal;
@@ -123,8 +127,8 @@
             // splitContainer1.Panel2
             // 
             this.splitContainer1.Panel2.Controls.Add(this.listView_info);
-            this.splitContainer1.Size = new System.Drawing.Size(408, 564);
-            this.splitContainer1.SplitterDistance = 288;
+            this.splitContainer1.Size = new System.Drawing.Size(439, 559);
+            this.splitContainer1.SplitterDistance = 285;
             this.splitContainer1.TabIndex = 10;
             // 
             // listView_checkin
@@ -135,14 +139,15 @@
             | System.Windows.Forms.AnchorStyles.Right)));
             this.listView_checkin.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
             this.id,
-            this.code,
-            this.time});
+            this.time,
+            this.from,
+            this.syncTime});
             this.listView_checkin.FullRowSelect = true;
             this.listView_checkin.GridLines = true;
             this.listView_checkin.Location = new System.Drawing.Point(3, 3);
             this.listView_checkin.MultiSelect = false;
             this.listView_checkin.Name = "listView_checkin";
-            this.listView_checkin.Size = new System.Drawing.Size(402, 282);
+            this.listView_checkin.Size = new System.Drawing.Size(433, 279);
             this.listView_checkin.TabIndex = 1;
             this.listView_checkin.UseCompatibleStateImageBehavior = false;
             this.listView_checkin.View = System.Windows.Forms.View.Details;
@@ -153,16 +158,20 @@
             this.id.Text = "id";
             this.id.Width = 111;
             // 
-            // code
-            // 
-            this.code.DisplayIndex = 2;
-            this.code.Text = "code";
-            // 
             // time
             // 
-            this.time.DisplayIndex = 1;
             this.time.Text = "time";
-            this.time.Width = 98;
+            this.time.Width = 74;
+            // 
+            // from
+            // 
+            this.from.Text = "from";
+            this.from.Width = 79;
+            // 
+            // syncTime
+            // 
+            this.syncTime.Text = "sync time";
+            this.syncTime.Width = 84;
             // 
             // listView_info
             // 
@@ -175,7 +184,7 @@
             this.listView_info.GridLines = true;
             this.listView_info.Location = new System.Drawing.Point(3, 3);
             this.listView_info.Name = "listView_info";
-            this.listView_info.Size = new System.Drawing.Size(402, 266);
+            this.listView_info.Size = new System.Drawing.Size(433, 264);
             this.listView_info.TabIndex = 1;
             this.listView_info.UseCompatibleStateImageBehavior = false;
             this.listView_info.View = System.Windows.Forms.View.Details;
@@ -204,7 +213,7 @@
             this.panel_start.Controls.Add(this.label_Port_Title);
             this.panel_start.Location = new System.Drawing.Point(6, 6);
             this.panel_start.Name = "panel_start";
-            this.panel_start.Size = new System.Drawing.Size(308, 564);
+            this.panel_start.Size = new System.Drawing.Size(308, 559);
             this.panel_start.TabIndex = 9;
             // 
             // Text_Port_Content
@@ -277,7 +286,7 @@
             this.tabPage_log.Location = new System.Drawing.Point(4, 22);
             this.tabPage_log.Name = "tabPage_log";
             this.tabPage_log.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage_log.Size = new System.Drawing.Size(734, 576);
+            this.tabPage_log.Size = new System.Drawing.Size(692, 570);
             this.tabPage_log.TabIndex = 1;
             this.tabPage_log.Text = "log";
             this.tabPage_log.UseVisualStyleBackColor = true;
@@ -292,7 +301,7 @@
             this.AllowDrop = true;
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(766, 626);
+            this.ClientSize = new System.Drawing.Size(797, 621);
             this.Controls.Add(this.tabControl);
             this.Name = "Form1";
             this.Text = "mTicket";
@@ -330,11 +339,12 @@
         private System.Windows.Forms.SplitContainer splitContainer1;
         private System.Windows.Forms.ListView listView_checkin;
         private System.Windows.Forms.ColumnHeader id;
-        private System.Windows.Forms.ColumnHeader code;
+        private System.Windows.Forms.ColumnHeader syncTime;
         private System.Windows.Forms.ColumnHeader time;
         private System.Windows.Forms.ListView listView_info;
         private System.Windows.Forms.ColumnHeader Key;
         private System.Windows.Forms.ColumnHeader value;
+        private System.Windows.Forms.ColumnHeader from;
     }
 }
 
