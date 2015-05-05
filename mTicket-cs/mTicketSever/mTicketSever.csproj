@@ -82,7 +82,6 @@
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="TcpSever\Callback\PingCallback.cs" />
-    <Compile Include="TcpSever\Callback\SampleCallback.cs" />
     <Compile Include="TcpSever\Callback\SyncCallback.cs" />
     <Compile Include="Beans\SettingBean.cs" />
     <Compile Include="Beans\SocketBackEventArgs.cs" />

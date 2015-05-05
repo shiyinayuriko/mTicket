@@ -226,7 +226,7 @@ public class MainActivity extends ActionBarActivity {
 		connectionBinder.stopSync();
 	}
 
-	private void updateDatebase(View view) {
+	private void updateDatebase(final View view) {
 		final CharSequence strDialogTitle = getString(R.string.ProgressDialog_wait_title);
 		final CharSequence strDialogBody = getString(R.string.ProgressDialog_updateDatabase_content__0);
 
@@ -262,6 +262,16 @@ public class MainActivity extends ActionBarActivity {
 					connectionBinder.startSync();
 					break;
 				case 1:
+					myDialog.dismiss();
+					disconnectHost(view);
+					AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+					builder.setTitle(getString(R.string.AlertDialog_searchResult_title_failure));
+					builder.setNeutralButton(getString(R.string.close), null);
+					builder.setTitle(getString(R.string.AlertDialog_connectResult_title_failure));
+					builder.setMessage(getString(R.string.AlertDialog_connectResult_content_1));
+					builder.setNeutralButton(getString(R.string.close), null);
+					builder.show();
+					break;
 				}
 			}
 		});

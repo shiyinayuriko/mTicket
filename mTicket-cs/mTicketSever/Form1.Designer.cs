@@ -77,7 +77,6 @@
             this.text_log.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.text_log.Enabled = false;
             this.text_log.Location = new System.Drawing.Point(6, 6);
             this.text_log.Multiline = true;
             this.text_log.Name = "text_log";

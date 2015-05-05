@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Text;
 using System.Windows.Forms;
 
@@ -14,7 +15,7 @@ namespace mTicket
             _codeTable = dbHandler.LoadCodeTable();
         }
 
-        public override string DealCommand(SocketBackEventArgs e)
+        protected override string OnDealCommand(string commandStr, string[] commandParams, string endPointName, IPEndPoint endPoint)
         {
             return _codeTable.GetJson();
         }

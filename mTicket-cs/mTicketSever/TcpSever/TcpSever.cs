@@ -58,7 +58,6 @@ namespace mTicket
                 if (r==null || !r.StartsWith(key)) continue;
                 var e = new SocketBackEventArgs { ReciveData = r, EndPoint = endPoint };
                 ret = CallbackList[key].DealCommand(e);
-                CallbackList[key].UpdateLine(e,ret);
             }
             return ret;
         }

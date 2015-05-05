@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Text;
 using System.Windows.Forms;
 
@@ -13,10 +14,16 @@ namespace mTicket
         public PingCallback(TextBox text_log):base(text_log)
         {
         }
+
+        protected override string OnDealCommand(string commandStr, string[] commandParams, string endPointName, IPEndPoint endPoint)
+        {
+            return null;
+        }
+
         public override string DealCommand(SocketBackEventArgs e)
         {
-
-            return (string)e.ReciveData;
+            UpdateLine((string)e.ReciveData, (string)e.ReciveData, "raw", e.EndPoint);
+            return (string) e.ReciveData;
         }
     }
 }

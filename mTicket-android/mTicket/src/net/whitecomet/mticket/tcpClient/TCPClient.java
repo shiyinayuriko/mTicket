@@ -5,17 +5,20 @@ import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
+import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.net.UnknownHostException;
 import java.util.HashSet;
 import java.util.Set;
 
+import net.whitecomet.mticket.ConnectionService;
 import net.whitecomet.mticket.data.TempStates;
 
 import android.content.Context;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.wifi.WifiManager;
+import android.util.Base64;
 
 public class TCPClient {
 	private String ip = null;
@@ -71,8 +74,8 @@ public class TCPClient {
 				proc = Runtime.getRuntime().exec(PING+curIp);
 				int result = proc.waitFor();
 				if (result == 0) {
-					Socket socket = new Socket(curIp, port);
-					socket.setSoTimeout(5000);
+					Socket socket = new Socket();
+					socket.connect(new InetSocketAddress(curIp,port), 5000);
 			        BufferedReader br = new BufferedReader(new InputStreamReader(socket.getInputStream()));
 			        BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream()));
 			        String pingLine = "ping "+Math.random();
@@ -98,8 +101,9 @@ public class TCPClient {
 	
 	public void connect() throws SocketConnectException{
 		try {
-			socket = new Socket(ip, port);
-			socket.setSoTimeout(TempStates.instance(context).severSettings==null?50000:TempStates.instance(context).severSettings.tcp_timeout);
+			socket = new Socket();
+			int timeOut = TempStates.instance(context).severSettings==null?5000:TempStates.instance(context).severSettings.tcp_timeout;
+			socket.connect(new InetSocketAddress(ip, port),timeOut);
 	        br = new BufferedReader(new InputStreamReader(socket.getInputStream()));
 	        bw = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream()));
 		} catch (UnknownHostException e) {
@@ -109,9 +113,8 @@ public class TCPClient {
 		}
 	}
 	
-	public String call(String s) throws NoInputStringException, SocketConnectException{
+	public String callRaw(String s) throws NoInputStringException, SocketConnectException{
 		if(s==null || s.trim().equals("")) throw new NoInputStringException();
-		
 		try {
 			bw.write(s + (s.endsWith("\n")?"":"\n"));
 	        bw.flush();
@@ -122,14 +125,37 @@ public class TCPClient {
 		}
 	}
 	
+	public String call(String command,String[] values)throws NoInputStringException, SocketConnectException{
+		String deviceName = TempStates.instance(context).getDeviceName();
+		String raw = command;
+		
+		raw += " "+ toBase64(deviceName);
+		for(String str:values){
+			raw += " " + toBase64(str); 
+		}
+		String rawRet = callRaw(raw);
+		
+		return fromBase64(rawRet);
+	}
+	public String call(String command)throws NoInputStringException, SocketConnectException{
+		return call(command,new String[0]);
+	}
+
+	protected static String toBase64(String str){
+		return Base64.encodeToString(str.getBytes(), Base64.NO_WRAP);
+	}
+	
+	protected static String fromBase64(String base64){
+		return new String(Base64.decode(base64, Base64.NO_WRAP));
+	}
 	public void disConnect(){
 		try {
 			br.close();
 			bw.close();
 	        socket.close();
-		} catch (IOException e) {
+		} catch (IOException|NullPointerException e) {
 			e.printStackTrace();
-		}
+		} 
 
 	}
 

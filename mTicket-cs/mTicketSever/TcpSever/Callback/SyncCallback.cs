@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Text;
 using System.Windows.Forms;
 using mTickLibs.codeData;
@@ -16,16 +17,13 @@ namespace mTicket
             _db = db;
         }
 
-        public override string DealCommand(SocketBackEventArgs e)
+        protected override string OnDealCommand(string commandStr, string[] commandParams, string endPointName, IPEndPoint endPoint)
         {
-            var line = (string) e.ReciveData;
-            string args = line.Substring(line.IndexOf(' ')+1);
-            
-            long timestamp = Convert.ToInt64(args.Substring(0,args.IndexOf(' ')));
+            long timestamp = Convert.ToInt64(commandParams[0]);
             CheckinData[] retCheckin = _db.GetCheckinDatas(timestamp);
 
-            string json = args.Substring(args.IndexOf(' ') + 1).Trim();
-            long newTimestamp = _db.SetCheckinDatas(JsonConvert.DeserializeObject<CheckinData[]>(json));
+            string json = commandParams[1].Trim();
+            long newTimestamp = _db.SetCheckinDatas(JsonConvert.DeserializeObject<CheckinData[]>(json),endPointName);
 
             return (newTimestamp+1) +" " + JsonConvert.SerializeObject(retCheckin);
         }

@@ -217,7 +217,7 @@ namespace mTicket
 
             using (SQLiteCommand cmd = new SQLiteCommand(conn))
             {
-                cmd.CommandText = "CREATE TABLE " + CheckinTableName + " (_id INTEGER, checkin_time TIME, sync_time timestamp );";
+                cmd.CommandText = "CREATE TABLE " + CheckinTableName + " (_id INTEGER, checkin_time TIME, sync_time timestamp, sync_from TEXT );";
                 cmd.ExecuteNonQuery();  
             }
             conn.Close();
@@ -250,14 +250,14 @@ namespace mTicket
             }
             return ret.ToArray();
         }
-        public long SetCheckinDatas(CheckinData[] checkinDatas, bool hasOwnTime = false)
+        public long SetCheckinDatas(CheckinData[] checkinDatas,string syncFrom, bool hasOwnTime = false)
         {
             long time = Convert.ToInt64((DateTime.UtcNow - new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc)).TotalMilliseconds);
 
             using (SQLiteCommand cmd = new SQLiteCommand(_conn))
             {
                 var transaction = _conn.BeginTransaction();
-                cmd.CommandText = "insert into " + CheckinTableName + " (_id, checkin_time,sync_time) values(@_id,@checkin_time, @sync_time)";
+                cmd.CommandText = "insert into " + CheckinTableName + " (_id, checkin_time,sync_time,sync_from) values(@_id,@checkin_time, @sync_time, @sync_from)";
                 foreach (var checkinData in checkinDatas)
                 {
                     cmd.Parameters.AddRange(new[]
@@ -265,6 +265,7 @@ namespace mTicket
                         new SQLiteParameter("@_id", checkinData.id),
                         new SQLiteParameter("@checkin_time", checkinData.checkin_time),
                         new SQLiteParameter("@sync_time",hasOwnTime?checkinData.sync_time:time),
+                        new SQLiteParameter("@sync_from",syncFrom),
                     });
                     cmd.ExecuteNonQuery();
                 }

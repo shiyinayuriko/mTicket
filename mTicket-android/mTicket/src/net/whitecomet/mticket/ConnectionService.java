@@ -72,7 +72,7 @@ public class ConnectionService extends Service {
 			Gson gson = new Gson();
 			
 			long timestamp = TempStates.instance(this).getSyncTimetamp();
-			String ret = tcp.call("syncCheckin "+ timestamp + " " + gson.toJson(checkin));
+			String ret = tcp.call("syncCheckin", new String[]{timestamp+"",gson.toJson(checkin)});
 			
 			long newTimestamp = Long.parseLong(ret.substring(0,ret.indexOf(' ')));
 			String json = ret.substring(ret.indexOf(' ')+1);
@@ -123,7 +123,7 @@ public class ConnectionService extends Service {
     			public void run() {
     	    		try {
 						tcp.connect();
-						String json = tcp.call("connect "+ConnectionServiceBinder.this.getName());
+						String json = tcp.call("connect");
 						TempStates.instance(ConnectionService.this).severSettings = new Gson().fromJson(json.trim(), SeverSettings.class);
 
 			    		TempStates.instance(ConnectionService.this).setHost(ipAddress, port);
@@ -174,13 +174,6 @@ public class ConnectionService extends Service {
 					}
 				};
 			}.start();
-    	}
-
-    	private String getName(){
-    		TelephonyManager tm = (TelephonyManager) getSystemService(Context.TELEPHONY_SERVICE);  
-            StringBuilder sb = new StringBuilder();  
-            sb.append(BluetoothAdapter.getDefaultAdapter().getName());
-    	        return sb.toString();
     	}
     }
 	

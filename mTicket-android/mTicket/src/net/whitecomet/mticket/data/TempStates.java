@@ -4,6 +4,7 @@ import net.whitecomet.mticket.data.beans.SeverSettings;
 
 import com.google.gson.Gson;
 
+import android.bluetooth.BluetoothAdapter;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
@@ -69,13 +70,16 @@ public class TempStates {
         mEditor.commit();
 	}
 	
-
-	
-	
 	public SeverSettings severSettings = null;
 	public void setSeverSettings(String settings){
 		Gson gson = new Gson();
 		severSettings = gson.fromJson(settings, SeverSettings.class);
+	}
+	
+	private String deviceName = null;
+	public String getDeviceName(){
+		if(deviceName==null) deviceName = BluetoothAdapter.getDefaultAdapter().getName();
+		return deviceName;
 	}
 
 }

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Text;
 using System.Windows.Forms;
 
@@ -14,11 +15,8 @@ namespace mTicket
         {
         }
 
-        public override string DealCommand(SocketBackEventArgs e)
+        protected override string OnDealCommand(string commandStr, string[] commandParams, string endPointName, IPEndPoint endPoint)
         {
-            var recieveStr = (string) e.ReciveData;
-            var name = recieveStr.Substring(recieveStr.IndexOf(' ')+1);
-            HostNameHolder.Instance.SetName(e.EndPoint.Address,name);
             return SettingBean.Instance.GetJson();
         }
     }
