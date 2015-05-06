@@ -1,5 +1,10 @@
 package net.whitecomet.mticket.data;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Locale;
+
 import net.whitecomet.mticket.data.beans.SeverSettings;
 
 import com.google.gson.Gson;
@@ -82,4 +87,16 @@ public class TempStates {
 		return deviceName;
 	}
 
+	private StringBuffer scanLog = new StringBuffer();
+	private DateFormat formater = new SimpleDateFormat("yy-MM-dd hh:mm:ss",Locale.getDefault());
+	public void appendScanLog(String logLine){
+		String dateStr = formater.format(new Date());
+		scanLog.append(dateStr+":"+logLine+"\n");
+	}
+	public String getScanLog(){
+		return scanLog.toString();
+	}
+	public void clearScanLog(){
+		scanLog = new StringBuffer();
+	}
 }

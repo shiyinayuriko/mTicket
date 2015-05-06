@@ -4,6 +4,7 @@ using System.Linq;
 using System.Net;
 using System.Text;
 using System.Windows.Forms;
+using mTicket.Beans;
 using mTickLibs.codeData;
 using Newtonsoft.Json;
 
@@ -36,6 +37,8 @@ namespace mTicket
             string json = commandParams[1].Trim();
             CheckinData[] checkins = JsonConvert.DeserializeObject<CheckinData[]>(json);
             long newTimestamp = _db.SetCheckinDatas(checkins, endPointName);
+
+            Log.ScanLog(endPointName,commandParams[2]);
 
             foreach (var checkin in checkins)
             {

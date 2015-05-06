@@ -435,11 +435,11 @@ public final class CaptureActivity extends Activity implements
 		beepManager.playBeepSoundAndVibrate();
 		
 		String code = rawResult.getText();
+		TempStates.instance(this).appendScanLog(code);
 		if(lastCheckCode!=null && lastCheckCode.equals(code)){
 			restartPreviewAfterDelay(100L);
 		}else{
 			checkin(code);
-			
 		}
 	}
 

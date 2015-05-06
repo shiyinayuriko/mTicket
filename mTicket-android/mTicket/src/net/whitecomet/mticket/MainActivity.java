@@ -182,7 +182,7 @@ public class MainActivity extends ActionBarActivity {
 					builder.setPositiveButton(getString(R.string.yes),new OnClickListener() {
 						@Override
 						public void onClick(DialogInterface dialog, int which) {
-							MainActivity.this.updateDatebase(view);
+							MainActivity.this.updateDatabase(view);
 						}
 					});
 					builder.setNegativeButton(getString(R.string.no), new OnClickListener() {
@@ -227,7 +227,7 @@ public class MainActivity extends ActionBarActivity {
 		connectionBinder.stopSync();
 	}
 
-	private void updateDatebase(final View view) {
+	private void updateDatabase(final View view) {
 		final CharSequence strDialogTitle = getString(R.string.ProgressDialog_wait_title);
 		final CharSequence strDialogBody = getString(R.string.ProgressDialog_updateDatabase_content__0);
 
@@ -239,7 +239,7 @@ public class MainActivity extends ActionBarActivity {
 		myDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
 		myDialog.setIndeterminate(false);
 		myDialog.show();
-		connectionBinder.updateDatebase(new Handler() {
+		connectionBinder.updateDatabase(new Handler() {
 			@Override
 			public void handleMessage(Message msg) {
 				switch (msg.what) {

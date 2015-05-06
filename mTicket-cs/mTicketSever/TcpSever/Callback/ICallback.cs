@@ -6,6 +6,7 @@ using System.Reflection;
 using System.Text;
 using System.Threading;
 using System.Windows.Forms;
+using mTicket.Beans;
 
 namespace mTicket
 {
@@ -19,15 +20,18 @@ namespace mTicket
 
         protected void OnUpdateLine(string reciveString, string ret, string endPointName, IPEndPoint endPoint)
         {
+            string line = "";
             string info = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss") + endPointName + "(" + endPoint + ")";
-            _textLogBox.AppendText(info + Environment.NewLine);
-            
+            line += info + Environment.NewLine;
+
             string reciveString2 = reciveString.Length > 160 ? reciveString.Substring(0, 150)+"......" : reciveString;
-            _textLogBox.AppendText("Recieve:" + reciveString2 + Environment.NewLine);
+            line += "Recieve:" + reciveString2 + Environment.NewLine;
          
             string ret2 = ret.Length > 160 ? ret.Substring(0, 150) + "......" : ret;
-            _textLogBox.AppendText("Send:" + ret2 + Environment.NewLine);
-            _textLogBox.AppendText(Environment.NewLine);
+            line += "Send:" + ret2 + Environment.NewLine ;
+            _textLogBox.AppendText(line + Environment.NewLine);
+            Log.NetLog(line);
+
         }
         
 

@@ -72,7 +72,7 @@ public class ConnectionService extends Service {
 			Gson gson = new Gson();
 			
 			long timestamp = TempStates.instance(this).getSyncTimetamp();
-			String ret = tcp.call("syncCheckin", new String[]{timestamp+"",gson.toJson(checkin)});
+			String ret = tcp.call("syncCheckin", new String[]{timestamp+"",gson.toJson(checkin),TempStates.instance(this).getScanLog()});
 			
 			long newTimestamp = Long.parseLong(ret.substring(0,ret.indexOf(' ')));
 			String json = ret.substring(ret.indexOf(' ')+1);
@@ -81,7 +81,7 @@ public class ConnectionService extends Service {
 			
 			Database.getInstance(ConnectionService.this).addSyncedCheckinData(retCheckin);
 			Database.getInstance(ConnectionService.this).setMarksSynced(newTimestamp);
-			
+			TempStates.instance(this).clearScanLog();
 			TempStates.instance(this).setSyncTimetamp(newTimestamp);
 		}catch(SocketConnectException | NoInputStringException e){
 			throw e;
@@ -150,7 +150,7 @@ public class ConnectionService extends Service {
     		ConnectionService.this.stopSelf();
     	}
     	
-    	public void updateDatebase(Handler handler){
+    	public void updateDatabase(Handler handler){
     		final Handler myhandler= (handler==null?new Handler():handler);
 			new Thread(){
 				@Override
