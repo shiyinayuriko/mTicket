@@ -78,7 +78,8 @@
 	    android:layout_width="match_parent"
 	    android:layout_height="wrap_content"
 	    android:text="text2" 
-	    android:onClick="test2"/>
+	    android:onClick="test2"
+	    android:visibility="gone"/>
 	<TextView 
 		android:id="@+id/text_lastCheckCode"
 		android:layout_width="match_parent"
