@@ -36,5 +36,15 @@ namespace mTicket.Beans
             NetWriter.Flush();
             NetLock.ReleaseReaderLock();
         }
+
+        private static readonly ReaderWriterLock ErrorLock = new ReaderWriterLock();
+        private static readonly StreamWriter ErrorWriter = new StreamWriter("./error.log", true);
+        public static void ErrorLog(string line)
+        {
+            ErrorLock.AcquireReaderLock(LockOverTime);
+            ErrorWriter.WriteLine(line);
+            ErrorWriter.Flush();
+            ErrorLock.ReleaseReaderLock();
+        }
     }
 }

@@ -21,7 +21,7 @@ namespace mTicket
         protected void OnUpdateLine(string reciveString, string ret, string endPointName, IPEndPoint endPoint)
         {
             string line = "";
-            string info = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss") + endPointName + "(" + endPoint + ")";
+            string info = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss ") + endPointName + "(" + endPoint + ")";
             line += info + Environment.NewLine;
 
             string reciveString2 = reciveString.Length > 160 ? reciveString.Substring(0, 150)+"......" : reciveString;
@@ -30,7 +30,8 @@ namespace mTicket
             string ret2 = ret.Length > 160 ? ret.Substring(0, 150) + "......" : ret;
             line += "Send:" + ret2 + Environment.NewLine ;
             _textLogBox.AppendText(line + Environment.NewLine);
-            Log.NetLog(line);
+            //TODO should implement in codeTableCallback
+            Log.NetLog(info + Environment.NewLine + "Recieve:" + reciveString + Environment.NewLine + "Send:" + (reciveString.StartsWith("codeTable") ? ret2 : ret) + Environment.NewLine);
 
         }
         

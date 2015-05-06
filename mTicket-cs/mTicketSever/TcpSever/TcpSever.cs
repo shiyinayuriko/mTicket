@@ -5,6 +5,7 @@ using System.Net;
 using System.Net.Sockets;
 using System.Text;
 using System.Threading;
+using mTicket.Beans;
 
 namespace mTicket
 {
@@ -44,8 +45,7 @@ namespace mTicket
             }
             catch(Exception e)
             {
-                //TODO
-                throw;
+                Log.ErrorLog(e.Message);
             }
         }
 
