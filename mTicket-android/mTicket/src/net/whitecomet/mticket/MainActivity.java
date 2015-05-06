@@ -15,6 +15,7 @@ import android.app.ProgressDialog;
 import android.content.ComponentName;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnClickListener;
+import android.content.res.Configuration;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.os.Bundle;
@@ -284,6 +285,8 @@ public class MainActivity extends ActionBarActivity {
 
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+		if(data==null) return;
+		
 		CodeDataReturn lastCheckCodeData = (CodeDataReturn) data.getSerializableExtra("lastCheckCodeData");
 		String lastCheckCode = data.getStringExtra("lastCheckCode");
 		if(lastCheckCode!=null) textLastCheckCode.setText(lastCheckCode);
