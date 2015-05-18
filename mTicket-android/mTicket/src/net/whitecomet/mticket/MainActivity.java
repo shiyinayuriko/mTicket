@@ -8,6 +8,7 @@ import net.whitecomet.mticket.data.Database;
 import net.whitecomet.mticket.data.TempStates;
 import net.whitecomet.mticket.data.beans.CheckinData;
 import net.whitecomet.mticket.data.beans.CodeDataReturn;
+import net.whitecomet.mticket.nfc.NfcManager;
 import net.whitecomet.mticket.scanner.CaptureActivity;
 import android.support.v7.app.ActionBarActivity;
 import android.app.AlertDialog;
@@ -18,6 +19,7 @@ import android.content.DialogInterface.OnClickListener;
 import android.content.res.Configuration;
 import android.content.Intent;
 import android.content.ServiceConnection;
+import android.nfc.NfcAdapter;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
@@ -48,6 +50,9 @@ public class MainActivity extends ActionBarActivity {
 		
 		textLastCheckCode = (TextView) findViewById(R.id.text_lastCheckCode);
 		textLastCheckCodeData = (TextView) findViewById(R.id.text_lastCheckCodeData);
+		
+		nfc = new NfcManager(this);
+		dealWithNfc(getIntent());
 	}
 
 	@Override
@@ -305,5 +310,31 @@ public class MainActivity extends ActionBarActivity {
 		builder.setTitle("checkin");
 		builder.setMessage(id+"");
 		builder.show();
+	}
+	
+	private NfcManager nfc;
+	@Override
+	protected void onNewIntent(Intent intent) {
+		super.onNewIntent(intent);
+		setIntent(intent);
+		dealWithNfc(intent);
+	}
+	
+	@Override
+	protected void onResume() {
+		super.onResume();
+		nfc.onResume(this);
+	}
+	@Override
+	protected void onPause() {
+		super.onPause();
+		nfc.onPause(this);
+	}
+	private void dealWithNfc(Intent intent){
+		if(intent.getAction().equals(NfcAdapter.ACTION_TECH_DISCOVERED)
+		|| intent.getAction().equals(NfcAdapter.ACTION_TAG_DISCOVERED)
+		){
+			nfc.dealwithIntent(intent);
+		}
 	}
 }
