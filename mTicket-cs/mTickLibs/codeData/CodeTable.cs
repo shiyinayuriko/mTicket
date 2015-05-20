@@ -15,7 +15,6 @@ namespace mTicket
         {
             return JsonConvert.SerializeObject(this);
         }
-
     }
 
     public class CodeInfo
@@ -23,6 +22,21 @@ namespace mTicket
         public int id;
         public string code;
         public string[] info;
+
+        public override bool Equals(object obj)
+        {
+            if (obj is CodeInfo)
+            {
+                return ((CodeInfo) obj).id == this.id;
+            }
+            else return false;
+        }
+
+        public void SetCode(string code)
+        {
+            this.code = code;
+            info[1] = code;
+        }
     }
 
 }
