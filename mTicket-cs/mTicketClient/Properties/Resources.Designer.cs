@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace mTicket.Properties {
+namespace mTicketClient.Properties {
     using System;
     
     
@@ -39,7 +39,7 @@ namespace mTicket.Properties {
         internal static global::System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.ReferenceEquals(resourceMan, null)) {
-                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("mTicket.Properties.Resources", typeof(Resources).Assembly);
+                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("mTicketClient.Properties.Resources", typeof(Resources).Assembly);
                     resourceMan = temp;
                 }
                 return resourceMan;
@@ -61,42 +61,11 @@ namespace mTicket.Properties {
         }
         
         /// <summary>
-        ///   查找类似 function checkin(tmp){
-        ///	if(tmp.checkin.length&gt;0) return false;
-        ///	else return true;
-        ///}
-        /// 的本地化字符串。
+        ///   查找类似 未找到服务器 的本地化字符串。
         /// </summary>
-        internal static string checkinLogic {
+        internal static string Launcher_EnableSearch_host_not_found {
             get {
-                return ResourceManager.GetString("checkinLogic", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   查找类似 数据源不匹配 的本地化字符串。
-        /// </summary>
-        internal static string Form1_ImportData_DataSauce_not_match {
-            get {
-                return ResourceManager.GetString("Form1_ImportData_DataSauce_not_match", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   查找类似 添加{0}条数据，共{1}条数据，抛弃{2}条数据 的本地化字符串。
-        /// </summary>
-        internal static string Form1_ImportData_ReportMessage {
-            get {
-                return ResourceManager.GetString("Form1_ImportData_ReportMessage", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   查找类似 导入文件格式错误 的本地化字符串。
-        /// </summary>
-        internal static string Form1_Tab_import_DragDrop_error_filename_extension {
-            get {
-                return ResourceManager.GetString("Form1_Tab_import_DragDrop_error_filename_extension", resourceCulture);
+                return ResourceManager.GetString("Launcher_EnableSearch_host_not_found", resourceCulture);
             }
         }
     }

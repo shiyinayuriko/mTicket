@@ -4,6 +4,7 @@ using System.Data.SQLite;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Runtime.Remoting.Messaging;
 using System.Text;
 using System.Xml.Linq;
 using mTicket.Beans;
@@ -47,11 +48,11 @@ namespace mTicket
                     var row = sheet.GetRow(i);
                     //info.id = Convert.ToInt32(row.GetCell(0).StringCellValue);
                     info.id = (int) row.GetCell(0).NumericCellValue;
-                    info.code = row.GetCell(1).ToString();
+                    info.code = row.GetCell(1) == null ? "" : row.GetCell(1).ToString();
                     info.info = new string[cellCount];
                     for (int j = 0; j < cellCount; j++)
                     {
-                        info.info[j] = row.GetCell(j).ToString();
+                        info.info[j] = row.GetCell(j) == null ? "" : row.GetCell(j).ToString();
                     }
                     table.infos[i-1] = info;
                 }
@@ -66,6 +67,34 @@ namespace mTicket
             }
             return table;
         }
+        
+        public static CodeTable CombineCodeTable(CodeTable tableSource, CodeTable tableAddition)
+        {
+            if (tableSource == null) return tableAddition;
+            if (tableAddition == null) return tableSource;
+
+            if(ArrayEquals(tableSource.columns, tableAddition.columns))
+            {
+                var tableRet = new CodeTable();
+                tableRet.columns = (string[])tableSource.columns.Clone();
+                List<CodeInfo> infos = new List<CodeInfo>((CodeInfo[])tableSource.infos.Clone());
+                foreach (var info in tableAddition.infos)
+                {
+                    if(!infos.Contains(info)) infos.Add(info);
+                }
+                tableRet.infos = infos.ToArray();
+                return tableRet;
+            }
+            else
+            {
+                return null;
+            }
+        }
+        public static bool ArrayEquals<T>(T[] a,T[] b)
+        {
+            if (a.Length != b.Length) return false;
+            return !a.Where((t, i) => !t.Equals(b[i])).Any();
+        }
 
         public static DataBaseHandler getDataBaseHandler(string path)
         {
@@ -73,12 +102,12 @@ namespace mTicket
         }
     }
 
-    public class DataBaseHandler
+    public class DataBaseHandler:IDisposable
     {
-        public static string CodeTableName = "code";
-        public static string CodeInfoTableName = "code_info";
-        public static string CodeInfoColumnTableName = "code_info_column";
-        public static string CheckinTableName = "checkin";
+        public const string CodeTableName = "code";
+        public const string CodeInfoTableName = "code_info";
+        public const string CodeInfoColumnTableName = "code_info_column";
+        public const string CheckinTableName = "checkin";
 
         private readonly SQLiteConnection _conn;
         public DataBaseHandler(string path)
@@ -361,6 +390,11 @@ namespace mTicket
                 transaction.Commit();
             }
             return time;
+        }
+        
+        public void Dispose()
+        {
+            _conn.Close();
         }
     }
 }

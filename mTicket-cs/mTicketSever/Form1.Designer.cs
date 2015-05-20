@@ -49,14 +49,29 @@
             this.label_IpAddress_Content = new System.Windows.Forms.Label();
             this.label_Database_Title = new System.Windows.Forms.Label();
             this.label_Port_Title = new System.Windows.Forms.Label();
+            this.tabPage_importer = new System.Windows.Forms.TabPage();
+            this.panel2 = new System.Windows.Forms.Panel();
+            this.listView_empty = new System.Windows.Forms.ListView();
+            this.columnHeader1 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.columnHeader2 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.panel1 = new System.Windows.Forms.Panel();
+            this.button_import = new System.Windows.Forms.Button();
+            this.button_export_database = new System.Windows.Forms.Button();
+            this.label_data_number_content = new System.Windows.Forms.Label();
+            this.label_data_number_title = new System.Windows.Forms.Label();
             this.tabPage_log = new System.Windows.Forms.TabPage();
             this.openDbFileDialog = new System.Windows.Forms.OpenFileDialog();
+            this.openImportFileDialog = new System.Windows.Forms.OpenFileDialog();
+            this.saveDb = new System.Windows.Forms.SaveFileDialog();
             this.tabControl.SuspendLayout();
             this.tabPage_main.SuspendLayout();
             this.splitContainer1.Panel1.SuspendLayout();
             this.splitContainer1.Panel2.SuspendLayout();
             this.splitContainer1.SuspendLayout();
             this.panel_start.SuspendLayout();
+            this.tabPage_importer.SuspendLayout();
+            this.panel2.SuspendLayout();
+            this.panel1.SuspendLayout();
             this.tabPage_log.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -83,7 +98,7 @@
             this.text_log.Name = "text_log";
             this.text_log.ReadOnly = true;
             this.text_log.ScrollBars = System.Windows.Forms.ScrollBars.Both;
-            this.text_log.Size = new System.Drawing.Size(680, 558);
+            this.text_log.Size = new System.Drawing.Size(717, 634);
             this.text_log.TabIndex = 1;
             // 
             // tabControl
@@ -92,24 +107,28 @@
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.tabControl.Controls.Add(this.tabPage_main);
+            this.tabControl.Controls.Add(this.tabPage_importer);
             this.tabControl.Controls.Add(this.tabPage_log);
             this.tabControl.Location = new System.Drawing.Point(12, 12);
             this.tabControl.Name = "tabControl";
             this.tabControl.SelectedIndex = 0;
-            this.tabControl.Size = new System.Drawing.Size(773, 597);
+            this.tabControl.Size = new System.Drawing.Size(737, 672);
             this.tabControl.TabIndex = 2;
             // 
             // tabPage_main
             // 
+            this.tabPage_main.AllowDrop = true;
             this.tabPage_main.Controls.Add(this.splitContainer1);
             this.tabPage_main.Controls.Add(this.panel_start);
             this.tabPage_main.Location = new System.Drawing.Point(4, 22);
             this.tabPage_main.Name = "tabPage_main";
             this.tabPage_main.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage_main.Size = new System.Drawing.Size(765, 571);
+            this.tabPage_main.Size = new System.Drawing.Size(729, 646);
             this.tabPage_main.TabIndex = 0;
             this.tabPage_main.Text = "启动";
             this.tabPage_main.UseVisualStyleBackColor = true;
+            this.tabPage_main.DragDrop += new System.Windows.Forms.DragEventHandler(this.Tab_main_DragDrop);
+            this.tabPage_main.DragEnter += new System.Windows.Forms.DragEventHandler(this.Tab_DragEnter);
             // 
             // splitContainer1
             // 
@@ -127,8 +146,8 @@
             // splitContainer1.Panel2
             // 
             this.splitContainer1.Panel2.Controls.Add(this.listView_info);
-            this.splitContainer1.Size = new System.Drawing.Size(439, 559);
-            this.splitContainer1.SplitterDistance = 285;
+            this.splitContainer1.Size = new System.Drawing.Size(403, 634);
+            this.splitContainer1.SplitterDistance = 321;
             this.splitContainer1.TabIndex = 10;
             // 
             // listView_checkin
@@ -147,7 +166,7 @@
             this.listView_checkin.Location = new System.Drawing.Point(3, 3);
             this.listView_checkin.MultiSelect = false;
             this.listView_checkin.Name = "listView_checkin";
-            this.listView_checkin.Size = new System.Drawing.Size(433, 279);
+            this.listView_checkin.Size = new System.Drawing.Size(397, 315);
             this.listView_checkin.TabIndex = 1;
             this.listView_checkin.UseCompatibleStateImageBehavior = false;
             this.listView_checkin.View = System.Windows.Forms.View.Details;
@@ -184,7 +203,7 @@
             this.listView_info.GridLines = true;
             this.listView_info.Location = new System.Drawing.Point(3, 3);
             this.listView_info.Name = "listView_info";
-            this.listView_info.Size = new System.Drawing.Size(433, 264);
+            this.listView_info.Size = new System.Drawing.Size(397, 303);
             this.listView_info.TabIndex = 1;
             this.listView_info.UseCompatibleStateImageBehavior = false;
             this.listView_info.View = System.Windows.Forms.View.Details;
@@ -213,7 +232,7 @@
             this.panel_start.Controls.Add(this.label_Port_Title);
             this.panel_start.Location = new System.Drawing.Point(6, 6);
             this.panel_start.Name = "panel_start";
-            this.panel_start.Size = new System.Drawing.Size(308, 559);
+            this.panel_start.Size = new System.Drawing.Size(308, 634);
             this.panel_start.TabIndex = 9;
             // 
             // Text_Port_Content
@@ -280,15 +299,126 @@
             this.label_Port_Title.TabIndex = 3;
             this.label_Port_Title.Text = "监听端口：";
             // 
+            // tabPage_importer
+            // 
+            this.tabPage_importer.AllowDrop = true;
+            this.tabPage_importer.Controls.Add(this.panel2);
+            this.tabPage_importer.Controls.Add(this.panel1);
+            this.tabPage_importer.Location = new System.Drawing.Point(4, 22);
+            this.tabPage_importer.Name = "tabPage_importer";
+            this.tabPage_importer.Padding = new System.Windows.Forms.Padding(3);
+            this.tabPage_importer.Size = new System.Drawing.Size(729, 646);
+            this.tabPage_importer.TabIndex = 2;
+            this.tabPage_importer.Text = "导入数据库";
+            this.tabPage_importer.UseVisualStyleBackColor = true;
+            this.tabPage_importer.DragDrop += new System.Windows.Forms.DragEventHandler(this.Tab_import_DragDrop);
+            this.tabPage_importer.DragEnter += new System.Windows.Forms.DragEventHandler(this.Tab_DragEnter);
+            // 
+            // panel2
+            // 
+            this.panel2.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.panel2.Controls.Add(this.listView_empty);
+            this.panel2.Location = new System.Drawing.Point(186, 6);
+            this.panel2.Name = "panel2";
+            this.panel2.Size = new System.Drawing.Size(537, 634);
+            this.panel2.TabIndex = 1;
+            // 
+            // listView_empty
+            // 
+            this.listView_empty.Activation = System.Windows.Forms.ItemActivation.OneClick;
+            this.listView_empty.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.listView_empty.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
+            this.columnHeader1,
+            this.columnHeader2});
+            this.listView_empty.FullRowSelect = true;
+            this.listView_empty.GridLines = true;
+            this.listView_empty.Location = new System.Drawing.Point(3, 3);
+            this.listView_empty.MultiSelect = false;
+            this.listView_empty.Name = "listView_empty";
+            this.listView_empty.Size = new System.Drawing.Size(531, 628);
+            this.listView_empty.TabIndex = 2;
+            this.listView_empty.UseCompatibleStateImageBehavior = false;
+            this.listView_empty.View = System.Windows.Forms.View.Details;
+            // 
+            // columnHeader1
+            // 
+            this.columnHeader1.Text = "id";
+            this.columnHeader1.Width = 163;
+            // 
+            // columnHeader2
+            // 
+            this.columnHeader2.Text = "code";
+            this.columnHeader2.Width = 165;
+            // 
+            // panel1
+            // 
+            this.panel1.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left)));
+            this.panel1.Controls.Add(this.button_import);
+            this.panel1.Controls.Add(this.button_export_database);
+            this.panel1.Controls.Add(this.label_data_number_content);
+            this.panel1.Controls.Add(this.label_data_number_title);
+            this.panel1.Location = new System.Drawing.Point(6, 6);
+            this.panel1.Name = "panel1";
+            this.panel1.Size = new System.Drawing.Size(174, 634);
+            this.panel1.TabIndex = 0;
+            // 
+            // button_import
+            // 
+            this.button_import.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.button_import.Location = new System.Drawing.Point(3, 24);
+            this.button_import.Name = "button_import";
+            this.button_import.Size = new System.Drawing.Size(168, 50);
+            this.button_import.TabIndex = 0;
+            this.button_import.Text = "导入数据文件";
+            this.button_import.UseVisualStyleBackColor = true;
+            this.button_import.Click += new System.EventHandler(this.button_import_Click);
+            // 
+            // button_export_database
+            // 
+            this.button_export_database.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.button_export_database.Enabled = false;
+            this.button_export_database.Location = new System.Drawing.Point(3, 80);
+            this.button_export_database.Name = "button_export_database";
+            this.button_export_database.Size = new System.Drawing.Size(168, 50);
+            this.button_export_database.TabIndex = 4;
+            this.button_export_database.Text = "导出数据库";
+            this.button_export_database.UseVisualStyleBackColor = true;
+            this.button_export_database.Click += new System.EventHandler(this.button_export_database_Click);
+            // 
+            // label_data_number_content
+            // 
+            this.label_data_number_content.AutoSize = true;
+            this.label_data_number_content.Location = new System.Drawing.Point(74, 9);
+            this.label_data_number_content.Name = "label_data_number_content";
+            this.label_data_number_content.Size = new System.Drawing.Size(11, 12);
+            this.label_data_number_content.TabIndex = 2;
+            this.label_data_number_content.Text = "0";
+            // 
+            // label_data_number_title
+            // 
+            this.label_data_number_title.AutoSize = true;
+            this.label_data_number_title.Location = new System.Drawing.Point(3, 9);
+            this.label_data_number_title.Name = "label_data_number_title";
+            this.label_data_number_title.Size = new System.Drawing.Size(65, 12);
+            this.label_data_number_title.TabIndex = 1;
+            this.label_data_number_title.Text = "数据条数：";
+            // 
             // tabPage_log
             // 
             this.tabPage_log.Controls.Add(this.text_log);
             this.tabPage_log.Location = new System.Drawing.Point(4, 22);
             this.tabPage_log.Name = "tabPage_log";
             this.tabPage_log.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage_log.Size = new System.Drawing.Size(692, 570);
+            this.tabPage_log.Size = new System.Drawing.Size(729, 646);
             this.tabPage_log.TabIndex = 1;
-            this.tabPage_log.Text = "log";
+            this.tabPage_log.Text = "通讯记录";
             this.tabPage_log.UseVisualStyleBackColor = true;
             // 
             // openDbFileDialog
@@ -296,17 +426,26 @@
             this.openDbFileDialog.Filter = "sqlite3 files (*.db)|*.db";
             this.openDbFileDialog.RestoreDirectory = true;
             // 
+            // openImportFileDialog
+            // 
+            this.openImportFileDialog.Filter = "数据源文件(*.db,*.xls,*.xlsx)|*.db;*.xls;*.xlsx|sqlite3 files (*.db)|*.db|Microsoft Ex" +
+    "cel file(*.xls,*.xlsx)|*.xls;*.xlsx";
+            this.openImportFileDialog.RestoreDirectory = true;
+            // 
+            // saveDb
+            // 
+            this.saveDb.DefaultExt = "db";
+            this.saveDb.Filter = "All files (*.*)|*.*|sqlite3 files (*.db)|*.db";
+            this.saveDb.FilterIndex = 2;
+            // 
             // Form1
             // 
-            this.AllowDrop = true;
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(797, 621);
+            this.ClientSize = new System.Drawing.Size(761, 696);
             this.Controls.Add(this.tabControl);
             this.Name = "Form1";
             this.Text = "mTicket";
-            this.DragDrop += new System.Windows.Forms.DragEventHandler(this.button_Database_Browse_DragDrop);
-            this.DragEnter += new System.Windows.Forms.DragEventHandler(this.button_Database_Browse_DragEnter);
             this.tabControl.ResumeLayout(false);
             this.tabPage_main.ResumeLayout(false);
             this.splitContainer1.Panel1.ResumeLayout(false);
@@ -314,6 +453,10 @@
             this.splitContainer1.ResumeLayout(false);
             this.panel_start.ResumeLayout(false);
             this.panel_start.PerformLayout();
+            this.tabPage_importer.ResumeLayout(false);
+            this.panel2.ResumeLayout(false);
+            this.panel1.ResumeLayout(false);
+            this.panel1.PerformLayout();
             this.tabPage_log.ResumeLayout(false);
             this.tabPage_log.PerformLayout();
             this.ResumeLayout(false);
@@ -345,6 +488,18 @@
         private System.Windows.Forms.ColumnHeader Key;
         private System.Windows.Forms.ColumnHeader value;
         private System.Windows.Forms.ColumnHeader from;
+        private System.Windows.Forms.TabPage tabPage_importer;
+        private System.Windows.Forms.Panel panel1;
+        private System.Windows.Forms.Button button_import;
+        private System.Windows.Forms.Label label_data_number_title;
+        private System.Windows.Forms.Label label_data_number_content;
+        private System.Windows.Forms.Button button_export_database;
+        private System.Windows.Forms.OpenFileDialog openImportFileDialog;
+        private System.Windows.Forms.SaveFileDialog saveDb;
+        private System.Windows.Forms.Panel panel2;
+        private System.Windows.Forms.ListView listView_empty;
+        private System.Windows.Forms.ColumnHeader columnHeader1;
+        private System.Windows.Forms.ColumnHeader columnHeader2;
     }
 }
 

@@ -3,12 +3,15 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Drawing;
+using System.Drawing.Drawing2D;
 using System.Linq;
 using System.Net;
 using System.Text;
 using System.Windows.Forms;
 using mTicket.Beans;
+using mTicket.Properties;
 using mTickLibs.codeData;
+using mTickLibs.Tools;
 
 namespace mTicket
 {
@@ -18,36 +21,41 @@ namespace mTicket
         {
             InitializeComponent();
             CheckForIllegalCrossThreadCalls = false;
-
-            label_IpAddress_Content.Text = GetIp();
+            label_IpAddress_Content.Text = IpTools.GetIp() ?? "未找到IP地址";
         }
-
-        private string _dbFileName;
-        private void button_Database_Browse_Click(object sender, EventArgs e)
-        {
-            if (openDbFileDialog.ShowDialog() == DialogResult.OK)
-            {
-                _dbFileName = openDbFileDialog.FileName;
-                UpdateFilename();
-            }
-        }
-
-        private void button_Database_Browse_DragDrop(object sender, DragEventArgs e)
-        {
-            _dbFileName  = ((Array)e.Data.GetData(DataFormats.FileDrop)).GetValue(0).ToString();
-            UpdateFilename();
-        }
-
-        private void button_Database_Browse_DragEnter(object sender, DragEventArgs e)
+        private void Tab_DragEnter(object sender, DragEventArgs e)
         {
             e.Effect = e.Data.GetDataPresent(DataFormats.FileDrop) ? DragDropEffects.Link : DragDropEffects.None;
         }
 
-        private void UpdateFilename()
+
+
+        private void button_Database_Browse_Click(object sender, EventArgs e)
         {
-            label_Database_Content.Text = _dbFileName;
+            if (openDbFileDialog.ShowDialog() == DialogResult.OK)
+            {
+                var dbFileName = openDbFileDialog.FileName;
+                UpdateFilename(dbFileName);
+            }
+        }
+        private void Tab_main_DragDrop(object sender, DragEventArgs e)
+        {
+            var dbFileName = ((Array)e.Data.GetData(DataFormats.FileDrop)).GetValue(0).ToString();
+            try
+            {
+                UpdateFilename(dbFileName);
+            }
+            catch (Exception exception)
+            {
+                MessageBox.Show(exception.Message);
+            }
+
+        }
+        private void UpdateFilename(string dbFileName)
+        {
+            _db = DataHandler.getDataBaseHandler(dbFileName);
+            label_Database_Content.Text = dbFileName;
             button_startListen.Enabled = true;
-            _db = DataHandler.getDataBaseHandler(_dbFileName);
         }
 
 
@@ -56,8 +64,6 @@ namespace mTicket
         {
             var t = new TcpSever { Port = Convert.ToInt32(Text_Port_Content.Text) };
 
-
-            //            t.CallbackList.Add("aaa", new SampleCallback(this));
             t.CallbackList.Add("ping", new PingCallback(text_log));
             t.CallbackList.Add("connect", new ConnectCallback(text_log));
             t.CallbackList.Add("codeTable", new CodeTableCallback(text_log, _db));
@@ -66,9 +72,6 @@ namespace mTicket
             button_startListen.Enabled = false;
             button_Database_Browse.Enabled = false;
             Text_Port_Content.Enabled = false;
-
-            //            db.SetCheckinDatas(new[] { new CheckinData() { checkin_time = "1-2-3-4", id = 222 } });
-            //            var tmp = db.GetCheckinDatas(1);
         }
 
         private void Text_Port_Content_TextChanged(object sender, EventArgs e)
@@ -80,7 +83,7 @@ namespace mTicket
         private void listView_checkin_SelectedIndexChanged(object sender, EventArgs e)
         {
             if (listView_checkin.SelectedItems.Count == 0) return;
-            int id = Convert.ToInt32(listView_checkin.SelectedItems[0].SubItems[0].Text);
+            var id = Convert.ToInt32(listView_checkin.SelectedItems[0].SubItems[0].Text);
             CodeDataDetail codeTable = _db.LoadCodeDataDetail(id);
             listView_info.Items.Clear();
             foreach (var pair in codeTable.info)
@@ -96,17 +99,111 @@ namespace mTicket
                 listView_info.Items.Add(record);
             }
         }
-        private static string GetIp()   //获取本地IP
+
+        private CodeTable _importDataTable = null;
+        private void Tab_import_DragDrop(object sender, DragEventArgs e)
         {
-            IPHostEntry IpEntry = System.Net.Dns.GetHostEntry(System.Net.Dns.GetHostName());
-            for (int i = 0; i != IpEntry.AddressList.Length; i++)
-            {
-                if (IpEntry.AddressList[i].AddressFamily == System.Net.Sockets.AddressFamily.InterNetwork)
-                {
-                    return IpEntry.AddressList[i].ToString();
-                }
-            }
-            return "未成功获取..";
+            var path = ((Array)e.Data.GetData(DataFormats.FileDrop)).GetValue(0).ToString();
+            ImportData(path);
         }
+
+        private void button_import_Click(object sender, EventArgs e)
+        {
+            if (openImportFileDialog.ShowDialog() == DialogResult.OK)
+            {
+                var path = openImportFileDialog.FileName;
+                ImportData(path);
+            }
+        }
+        private void ImportData(string path)
+        {
+            try
+            {
+                if (path.EndsWith(".xls") || path.EndsWith(".xlsx")||path.EndsWith(".db"))
+                {
+                    CodeTable dataTable = null;
+
+                    if(path.EndsWith(".xls") || path.EndsWith(".xlsx")) dataTable = DataHandler.LoadExcels(path);
+                    else using (var database = DataHandler.getDataBaseHandler(path))
+                    {
+                        dataTable = database.LoadCodeTable();
+                    }
+                   
+                    var newTable = DataHandler.CombineCodeTable(_importDataTable, dataTable);
+
+                    if (newTable == null)
+                    {
+                        MessageBox.Show(Resources.Form1_ImportData_DataSauce_not_match);
+                    }
+                    else
+                    {
+                        var oldLength = 0;
+                        if (_importDataTable != null) oldLength = _importDataTable.infos.Length;
+                        var newLength = newTable.infos.Length;
+                        var additionLength = 0;
+                        if (dataTable != null) additionLength = dataTable.infos.Length;
+
+                        string str = String.Format(Resources.Form1_ImportData_ReportMessage, newLength - oldLength, newLength, oldLength + additionLength - newLength);
+
+                        _importDataTable = newTable;
+                        button_export_database.Enabled = true;
+                        label_data_number_content.Text = _importDataTable.infos.Length.ToString();
+
+                        MessageBox.Show(str);
+                        UpdateEmptyCodeList();
+                    }
+                }
+                else
+                {
+                    MessageBox.Show(Resources.Form1_Tab_import_DragDrop_error_filename_extension);
+                }
+
+            }
+            catch (Exception exception)
+            {
+                MessageBox.Show(exception.Message);
+            }
+
+        }
+
+        private void button_export_database_Click(object sender, EventArgs e)
+        {
+            if (saveDb.ShowDialog() == DialogResult.OK)
+            {
+                var fName = saveDb.FileName;
+                DataBaseHandler.SaveCodeTable(_importDataTable, fName);
+            }
+        }
+
+        private readonly Dictionary<int,CodeInfo> _emptyTable = new Dictionary<int, CodeInfo>();
+        private void UpdateEmptyCodeList()
+        {
+            _emptyTable.Clear();
+            foreach (var info in _importDataTable.infos)
+            {
+                if(!info.code.Trim().Equals("")) continue;;
+                if(!_emptyTable.ContainsKey(info.id))
+                    _emptyTable.Add(info.id,info);
+            }
+
+            listView_empty.Columns.Clear();
+            for(var i=0;i<_importDataTable.columns.Length;i++)
+            {
+                listView_empty.Columns.Add(_importDataTable.columns[i]);
+            }
+
+            listView_empty.Items.Clear();
+            foreach (var info in _emptyTable.Values)
+            {
+
+                var record = new ListViewItem(info.info[0]);
+                for (int i = 1; i < info.info.Length; i++)
+                {
+                    record.SubItems.Add(info.info[i]);
+                }
+                listView_empty.Items.Add(record);
+            }
+        }
+    
     }
 }
