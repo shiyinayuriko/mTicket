@@ -11,6 +11,7 @@ using System.Windows.Forms;
 using mTicket.Beans;
 using mTicket.Properties;
 using mTickLibs.codeData;
+using mTickLibs.Tools;
 
 namespace mTicket
 {
@@ -20,8 +21,7 @@ namespace mTicket
         {
             InitializeComponent();
             CheckForIllegalCrossThreadCalls = false;
-
-            label_IpAddress_Content.Text = GetIp();
+            label_IpAddress_Content.Text = IpTools.GetIp() ?? "未找到IP地址";
         }
         private void Tab_DragEnter(object sender, DragEventArgs e)
         {
@@ -99,19 +99,6 @@ namespace mTicket
                 listView_info.Items.Add(record);
             }
         }
-        private static string GetIp()   //获取本地IP
-        {
-            IPHostEntry ipEntry = System.Net.Dns.GetHostEntry(System.Net.Dns.GetHostName());
-            for (int i = 0; i != ipEntry.AddressList.Length; i++)
-            {
-                if (ipEntry.AddressList[i].AddressFamily == System.Net.Sockets.AddressFamily.InterNetwork)
-                {
-                    return ipEntry.AddressList[i].ToString();
-                }
-            }
-            return "未成功获取..";
-        }
-
 
         private CodeTable _importDataTable = null;
         private void Tab_import_DragDrop(object sender, DragEventArgs e)
