@@ -28,7 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
-            this.text_Port_Content = new System.Windows.Forms.TextBox();
+            this.textBox_Port_Content = new System.Windows.Forms.TextBox();
             this.label_IpAddress_Title = new System.Windows.Forms.Label();
             this.label_Port_Title = new System.Windows.Forms.Label();
             this.textBox_IpAddress_Content = new System.Windows.Forms.TextBox();
@@ -38,17 +38,17 @@
             this.panel1.SuspendLayout();
             this.SuspendLayout();
             // 
-            // text_Port_Content
+            // textBox_Port_Content
             // 
-            this.text_Port_Content.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            this.textBox_Port_Content.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.text_Port_Content.Font = new System.Drawing.Font("宋体", 12F);
-            this.text_Port_Content.Location = new System.Drawing.Point(114, 34);
-            this.text_Port_Content.Name = "text_Port_Content";
-            this.text_Port_Content.Size = new System.Drawing.Size(150, 26);
-            this.text_Port_Content.TabIndex = 13;
-            this.text_Port_Content.Text = "8000";
-            this.text_Port_Content.TextChanged += new System.EventHandler(this.Text_Port_Content_TextChanged);
+            this.textBox_Port_Content.Font = new System.Drawing.Font("宋体", 12F);
+            this.textBox_Port_Content.Location = new System.Drawing.Point(114, 34);
+            this.textBox_Port_Content.Name = "textBox_Port_Content";
+            this.textBox_Port_Content.Size = new System.Drawing.Size(150, 26);
+            this.textBox_Port_Content.TabIndex = 13;
+            this.textBox_Port_Content.Text = "8000";
+            this.textBox_Port_Content.TextChanged += new System.EventHandler(this.Text_Port_Content_TextChanged);
             // 
             // label_IpAddress_Title
             // 
@@ -103,6 +103,7 @@
             this.button_connect.TabIndex = 16;
             this.button_connect.Text = "链接服务器";
             this.button_connect.UseVisualStyleBackColor = true;
+            this.button_connect.Click += new System.EventHandler(this.button_connect_Click);
             // 
             // panel1
             // 
@@ -113,7 +114,7 @@
             this.panel1.Controls.Add(this.button_connect);
             this.panel1.Controls.Add(this.label_IpAddress_Title);
             this.panel1.Controls.Add(this.button_search);
-            this.panel1.Controls.Add(this.text_Port_Content);
+            this.panel1.Controls.Add(this.textBox_Port_Content);
             this.panel1.Controls.Add(this.textBox_IpAddress_Content);
             this.panel1.Location = new System.Drawing.Point(12, 12);
             this.panel1.Name = "panel1";
@@ -136,7 +137,7 @@
 
         #endregion
 
-        private System.Windows.Forms.TextBox text_Port_Content;
+        private System.Windows.Forms.TextBox textBox_Port_Content;
         private System.Windows.Forms.Label label_IpAddress_Title;
         private System.Windows.Forms.Label label_Port_Title;
         private System.Windows.Forms.TextBox textBox_IpAddress_Content;

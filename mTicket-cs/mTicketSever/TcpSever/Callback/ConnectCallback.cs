@@ -17,7 +17,7 @@ namespace mTicket
 
         protected override string OnDealCommand(string commandStr, string[] commandParams, string endPointName, IPEndPoint endPoint)
         {
-            return SettingBean.Instance.GetJson();
+            return SettingCountainer.Instance.GetJson();
         }
     }
 }

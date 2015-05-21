@@ -9,6 +9,7 @@ using System.Text;
 using System.Xml.Linq;
 using mTicket.Beans;
 using mTickLibs.codeData;
+using mTickLibs.Tools;
 using NPOI.HSSF.UserModel;
 using NPOI.SS.UserModel;
 using NPOI.XSSF.UserModel;
@@ -370,7 +371,7 @@ namespace mTicket
         }
         public long SetCheckinDatas(CheckinData[] checkinDatas,string syncFrom, bool hasOwnTime = false)
         {
-            long time = Convert.ToInt64((DateTime.UtcNow - new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc)).TotalMilliseconds);
+            long time = TimeTools.CurrentTimeMillis();
 
             using (SQLiteCommand cmd = new SQLiteCommand(_conn))
             {

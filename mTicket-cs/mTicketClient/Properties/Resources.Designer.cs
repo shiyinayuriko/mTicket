@@ -61,6 +61,15 @@ namespace mTicketClient.Properties {
         }
         
         /// <summary>
+        ///   查找类似 服务器设置错误 的本地化字符串。
+        /// </summary>
+        internal static string Launcher_button_connect_Click_error_host_settings {
+            get {
+                return ResourceManager.GetString("Launcher_button_connect_Click_error_host_settings", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   查找类似 未找到服务器 的本地化字符串。
         /// </summary>
         internal static string Launcher_EnableSearch_host_not_found {

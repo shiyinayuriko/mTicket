@@ -36,9 +36,9 @@ namespace mTickLibs.Tools
 
                 PingRet prt = new PingRet
                 {
-                    mrEvent = new ManualResetEvent(false),
-                    ip = ipPrx + i,
-                    port = port
+                    MrEvent = new ManualResetEvent(false),
+                    Ip = ipPrx + i,
+                    Port = port
                 };
 
                 pingRets.Add(prt);
@@ -46,8 +46,8 @@ namespace mTickLibs.Tools
             }
             foreach (var pingRet in pingRets)
             {
-                pingRet.mrEvent.WaitOne();
-                if (pingRet.ip != null) return pingRet.ip;
+                pingRet.MrEvent.WaitOne();
+                if (pingRet.Ip != null) return pingRet.Ip;
             }
 
             return null;
@@ -55,8 +55,8 @@ namespace mTickLibs.Tools
 
         private static void Ping(object state)
         {
-            string ip = ((PingRet) state).ip;
-            int port = ((PingRet) state).port;
+            string ip = ((PingRet) state).Ip;
+            int port = ((PingRet) state).Port;
 
             PingReply reply = new Ping().Send(ip, 500);
 
@@ -64,9 +64,11 @@ namespace mTickLibs.Tools
             {
                 try
                 {
-                    Socket socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
-                    socket.SendTimeout = 5000;
-                    socket.ReceiveTimeout = 5000;
+                    Socket socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp)
+                    {
+                        SendTimeout = 5000,
+                        ReceiveTimeout = 5000
+                    };
                     socket.Connect(ip, port);
 
                     String pingLine = "ping " + new Random().NextDouble();
@@ -76,27 +78,32 @@ namespace mTickLibs.Tools
                     var sr = new StreamReader(new NetworkStream(socket), Encoding.GetEncoding("UTF-8"));
                     var str = sr.ReadLine();
 
-                    ((PingRet)state).ip = pingLine.Equals(str) ? ip : null;
+                    ((PingRet)state).Ip = pingLine.Equals(str) ? ip : null;
 
                     socket.Close();
                 }
                 catch (Exception)
                 {
-                    ((PingRet)state).ip = null;
+                    ((PingRet)state).Ip = null;
                 }
             }
             else
             {
-                ((PingRet) state).ip = null;
+                ((PingRet) state).Ip = null;
             }
-            ((PingRet) state).mrEvent.Set();
+            ((PingRet) state).MrEvent.Set();
+        }
+
+        public static string LocalName()
+        {
+            return Environment.MachineName;
         }
     }
 
     class PingRet
     {
-        internal string ip;
-        internal int port;
-        internal ManualResetEvent mrEvent;
+        internal string Ip;
+        internal int Port;
+        internal ManualResetEvent MrEvent;
     }
 }

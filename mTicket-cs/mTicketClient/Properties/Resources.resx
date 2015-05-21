@@ -117,4 +117,7 @@
   <data name="Launcher_EnableSearch_host_not_found" xml:space="preserve">
     <value>未找到服务器</value>
   </data>
+  <data name="Launcher_button_connect_Click_error_host_settings" xml:space="preserve">
+    <value>服务器设置错误</value>
+  </data>
 </root>

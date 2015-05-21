@@ -38,7 +38,7 @@ namespace mTicket
             CheckinData[] checkins = JsonConvert.DeserializeObject<CheckinData[]>(json);
             long newTimestamp = _db.SetCheckinDatas(checkins, endPointName);
 
-            Log.ScanLog(endPointName,commandParams[2]);
+            LogTools.ScanLog(endPointName,commandParams[2]);
 
             foreach (var checkin in checkins)
             {

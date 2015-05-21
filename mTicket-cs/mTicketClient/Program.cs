@@ -15,7 +15,13 @@ namespace mTicketClient
         {
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
-            Application.Run(new Launcher());
+            
+            Launcher lancher = new Launcher();
+            lancher.ShowDialog();
+            if (lancher.DialogResult == DialogResult.OK)
+            {
+                Application.Run(new Scanner(lancher.ResultIpAddr,lancher.ResultPort));
+            }
         }
     }
 }
