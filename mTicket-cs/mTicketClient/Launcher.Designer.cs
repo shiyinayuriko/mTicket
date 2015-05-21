@@ -101,7 +101,7 @@
             this.button_connect.Name = "button_connect";
             this.button_connect.Size = new System.Drawing.Size(261, 50);
             this.button_connect.TabIndex = 16;
-            this.button_connect.Text = "链接服务器";
+            this.button_connect.Text = "连接服务器";
             this.button_connect.UseVisualStyleBackColor = true;
             this.button_connect.Click += new System.EventHandler(this.button_connect_Click);
             // 

@@ -13,13 +13,9 @@ namespace mTicketClient
     {
         private ServiceContainer _service;
 
-        public Scanner()
-        {
-            InitializeComponent();
-        }
-
         public Scanner(string ipAddr, int port)
         {
+            InitializeComponent();
             _service = new ServiceContainer(ipAddr, port);
         }
     }
