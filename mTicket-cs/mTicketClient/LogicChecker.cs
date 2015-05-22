@@ -24,7 +24,7 @@ namespace mTicketClient
 
         public bool Checkin(CodeDataDetail codeData)
         {
-            
+            if (codeData == null) return false;
             string json = JsonConvert.SerializeObject(codeData);
             var result = _sc.Eval("pre('" + json + "')");
             return (bool)result;

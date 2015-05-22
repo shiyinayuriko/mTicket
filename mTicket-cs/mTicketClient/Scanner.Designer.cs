@@ -44,6 +44,7 @@
             this.text_scan_result = new System.Windows.Forms.TextBox();
             this.splitContainer2 = new System.Windows.Forms.SplitContainer();
             this.splitContainer3 = new System.Windows.Forms.SplitContainer();
+            this.isPass = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.splitContainer1.Panel1.SuspendLayout();
             this.splitContainer1.Panel2.SuspendLayout();
             this.splitContainer1.SuspendLayout();
@@ -64,6 +65,7 @@
             this.textBox_manually_input.Name = "textBox_manually_input";
             this.textBox_manually_input.Size = new System.Drawing.Size(285, 21);
             this.textBox_manually_input.TabIndex = 0;
+            this.textBox_manually_input.KeyDown += new System.Windows.Forms.KeyEventHandler(this.textBox_manually_input_KeyDown);
             // 
             // label_manually_input
             // 
@@ -107,6 +109,7 @@
             this.listView_checkin.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
             this.id,
             this.code,
+            this.isPass,
             this.checkin_time,
             this.device});
             this.listView_checkin.Enabled = false;
@@ -119,6 +122,7 @@
             this.listView_checkin.TabIndex = 4;
             this.listView_checkin.UseCompatibleStateImageBehavior = false;
             this.listView_checkin.View = System.Windows.Forms.View.Details;
+            this.listView_checkin.SelectedIndexChanged += new System.EventHandler(this.listView_checkin_SelectedIndexChanged);
             // 
             // id
             // 
@@ -243,6 +247,10 @@
             this.splitContainer3.SplitterDistance = 381;
             this.splitContainer3.TabIndex = 4;
             // 
+            // isPass
+            // 
+            this.isPass.Text = "isPass";
+            // 
             // Scanner
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
@@ -284,5 +292,6 @@
         public System.Windows.Forms.TextBox text_scan_result;
         private System.Windows.Forms.SplitContainer splitContainer2;
         private System.Windows.Forms.SplitContainer splitContainer3;
+        private System.Windows.Forms.ColumnHeader isPass;
     }
 }

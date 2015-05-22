@@ -12,5 +12,10 @@ namespace mTickLibs.Tools
             long time = Convert.ToInt64((DateTime.UtcNow - new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc)).TotalMilliseconds);
             return time;
         }
+        public static long GetSyncTimetamp()
+        {
+            //TODO
+            return 0;
+        }
     }
 }

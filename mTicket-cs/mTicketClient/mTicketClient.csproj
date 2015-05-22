@@ -59,6 +59,10 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\libs\Newtonsoft.Json.dll</HintPath>
     </Reference>
+    <Reference Include="RawInput, Version=1.0.0.0, Culture=neutral, processorArchitecture=x86">
+      <HintPath>..\libs\RawInput.dll</HintPath>
+      <SpecificVersion>False</SpecificVersion>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Configuration" />
     <Reference Include="System.Core" />
@@ -71,6 +75,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="KeyHandler.cs" />
     <Compile Include="Launcher.cs">
       <SubType>Form</SubType>
     </Compile>

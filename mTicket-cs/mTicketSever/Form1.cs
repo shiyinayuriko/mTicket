@@ -83,7 +83,9 @@ namespace mTicket
         private void listView_checkin_SelectedIndexChanged(object sender, EventArgs e)
         {
             if (listView_checkin.SelectedItems.Count == 0) return;
+            //TODO
             var id = Convert.ToInt32(listView_checkin.SelectedItems[0].SubItems[0].Text);
+            
             CodeDataDetail codeTable = _db.LoadCodeDataDetail(id);
             listView_info.Items.Clear();
             foreach (var pair in codeTable.info)

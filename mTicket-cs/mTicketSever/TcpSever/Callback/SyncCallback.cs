@@ -18,7 +18,7 @@ namespace mTicket
         {
             _db = db;
             _liseview = liseview;
-            CheckinData[] checkins = _db.GetCheckinDatas(0);
+            CheckinData[] checkins = _db.GetAllCheckinDatas();
             foreach (var checkin in checkins)
             {
                 var record = new ListViewItem(checkin.id + "");

@@ -10,6 +10,7 @@ using mTicket;
 using mTicket.Beans;
 using mTicketClient.Properties;
 using mTickLibs.codeData;
+using mTickLibs.Tools;
 using Microsoft.Win32;
 using Newtonsoft.Json;
 using Settings = mTickLibs.Beans.Settings;
@@ -29,6 +30,8 @@ namespace mTicketClient
         private DataBaseHandler _db;
 
         private LogicChecker _logicChecker;
+        public delegate void OnFinishCheckin(bool isSuccess,string code, string device,CodeDataDetail codeData);
+        public OnFinishCheckin FinishCheckin;
         public ServiceContainer(string ipAddr, int port, Form form)
         {
             _tcp = new TcpClient(ipAddr,port);
@@ -136,31 +139,59 @@ namespace mTicketClient
         {
             if (_isSyncing) return;
             _isSyncing = true;
+            var checkin = _db.MarkUnsynced();
 
+            try
+            {
+                _tcp.Connect();
+                UpdateStete("链接服务器");
+                string ret = _tcp.Call("syncCheckin", new[]
+                {
+                    TimeTools .GetSyncTimetamp() + "",
+                    JsonConvert.SerializeObject(checkin), 
+                    "notImply"//TempStates.instance(this).getScanLog()
+                });
+                UpdateStete("传输数据完成");
 
-            //TODO
+                long newTimestamp = Convert.ToInt64(ret.Substring(0, ret.IndexOf(' ')));
+                String json = ret.Substring(ret.IndexOf(' ') + 1);
+                var retCheckin = JsonConvert.DeserializeObject<CheckinData[]>(json);
+                UpdateStete("解析数据完成");
+                _db.AddSyncedCheckinData(retCheckin);
+                _db.SetMarksSynced(newTimestamp);
 
+                UpdateStete("同步数据完成");
 
+                //TODO SyncTime
+//                TempStates.instance(this).clearScanLog();
+//                TempStates.instance(this).setSyncTimetamp(newTimestamp);
+            }
+            catch (Exception e)
+            {
+                UpdateStete("同步发生异常");
+            }
+            finally
+            {
+                _tcp.DisConnect();
+            }
             _isSyncing = false;
         }
 
 
-        public delegate void CheckinSuccess(bool isSuccess, CodeDataDetail codeData);
-        public void Checkin(string code, string device, CheckinSuccess checkinSuccess)
+        public void Checkin(string code, string device)
         {
             try
             {
                 CodeDataDetail data = _db.LoadCodeDataDetail(code);
-                //TODO updateResult
 
                 bool isPass = _logicChecker.Checkin(data);
                 if (isPass) _db.Checkin(data.id,device);
 
 
                 if (_form.InvokeRequired)
-                    _form.Invoke(new CheckinSuccess(checkinSuccess), isPass, data);
+                    _form.Invoke(new OnFinishCheckin(FinishCheckin), isPass, code, data);
                 else
-                    checkinSuccess(isPass, data);
+                    FinishCheckin(isPass,code, device,data);
             }
             catch (Exception e)
             {
@@ -168,11 +199,6 @@ namespace mTicketClient
             }
 
         }
-
-
-
-
-
 
         private void UpdateStete(string message)
         {
@@ -184,6 +210,16 @@ namespace mTicketClient
             {
                 Invoke(message);
             }
+        }
+
+        public CheckinData[] GetCheckinDatas()
+        {
+            return _db.GetAllCheckinDatas();
+        }
+
+        internal CodeDataDetail LoadCodeDataDetail(int id)
+        {
+            return _db.LoadCodeDataDetail(id);
         }
     }
 }
