@@ -12,26 +12,29 @@ namespace mTicketClient
     {
         private readonly string _ipAddr;
         private readonly int _port;
+        public int TimeOut;
 
         public TcpClient(string ipAddr, int port)
         {
             _port = port;
             _ipAddr = ipAddr;
+            TimeOut = 5000;
         }
 
         private Socket _socket;
         private StreamReader _sr;
-        private void Connect(){
+        public void Connect()
+        {
             _socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp)
             {
-                SendTimeout = 5000,
-                ReceiveTimeout = 5000
+                SendTimeout = TimeOut,
+                ReceiveTimeout = TimeOut
             };
             _socket.Connect(_ipAddr, _port);
             _sr = new StreamReader(new NetworkStream(_socket), Encoding.GetEncoding("UTF-8"));
 	    }
 
-        private void DisConnect()
+        public void DisConnect()
         {
             try
             {
@@ -61,7 +64,7 @@ namespace mTicketClient
             raw += " " + Base64Tools.ToBase64(deviceName);
             raw = values.Aggregate(raw, (current, str) => current + (" " + Base64Tools.ToBase64(str)));
             string ret = CallRaw(raw);
-            return ret;
+            return Base64Tools.FromBase64(ret);
         }
 
         public string Call(string command)

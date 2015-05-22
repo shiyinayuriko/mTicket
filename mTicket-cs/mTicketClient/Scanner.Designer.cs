@@ -36,10 +36,10 @@
             this.code = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.checkin_time = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.device = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.label_client_state = new System.Windows.Forms.Label();
             this.listView_info = new System.Windows.Forms.ListView();
             this.Key = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.value = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
-            this.label_client_state = new System.Windows.Forms.Label();
             this.lable_pass = new System.Windows.Forms.Label();
             this.text_scan_result = new System.Windows.Forms.TextBox();
             this.splitContainer2 = new System.Windows.Forms.SplitContainer();
@@ -59,6 +59,7 @@
             // 
             this.textBox_manually_input.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
+            this.textBox_manually_input.Enabled = false;
             this.textBox_manually_input.Location = new System.Drawing.Point(87, 5);
             this.textBox_manually_input.Name = "textBox_manually_input";
             this.textBox_manually_input.Size = new System.Drawing.Size(285, 21);
@@ -108,6 +109,7 @@
             this.code,
             this.checkin_time,
             this.device});
+            this.listView_checkin.Enabled = false;
             this.listView_checkin.FullRowSelect = true;
             this.listView_checkin.GridLines = true;
             this.listView_checkin.Location = new System.Drawing.Point(3, 64);
@@ -138,6 +140,16 @@
             this.device.Text = "device";
             this.device.Width = 86;
             // 
+            // label_client_state
+            // 
+            this.label_client_state.AutoSize = true;
+            this.label_client_state.Font = new System.Drawing.Font("宋体", 11F);
+            this.label_client_state.Location = new System.Drawing.Point(20, 36);
+            this.label_client_state.Name = "label_client_state";
+            this.label_client_state.Size = new System.Drawing.Size(37, 15);
+            this.label_client_state.TabIndex = 2;
+            this.label_client_state.Text = "就绪";
+            // 
             // listView_info
             // 
             this.listView_info.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
@@ -146,6 +158,7 @@
             this.listView_info.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
             this.Key,
             this.value});
+            this.listView_info.Enabled = false;
             this.listView_info.GridLines = true;
             this.listView_info.Location = new System.Drawing.Point(3, 3);
             this.listView_info.Name = "listView_info";
@@ -163,16 +176,6 @@
             // 
             this.value.Text = "值";
             this.value.Width = 166;
-            // 
-            // label_client_state
-            // 
-            this.label_client_state.AutoSize = true;
-            this.label_client_state.Font = new System.Drawing.Font("宋体", 11F);
-            this.label_client_state.Location = new System.Drawing.Point(20, 36);
-            this.label_client_state.Name = "label_client_state";
-            this.label_client_state.Size = new System.Drawing.Size(37, 15);
-            this.label_client_state.TabIndex = 2;
-            this.label_client_state.Text = "就绪";
             // 
             // lable_pass
             // 

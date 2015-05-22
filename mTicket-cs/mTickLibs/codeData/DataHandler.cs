@@ -200,6 +200,7 @@ namespace mTicket
                     }
                     reader.Close();
                 }
+                _columns = columnsTmp;
             }
 
             CodeDataDetail detail = new CodeDataDetail();
@@ -250,7 +251,9 @@ namespace mTicket
                             case "_id": checkinData.id = reader.GetInt32(i); break;
                             case "checkin_time":
                                 checkinData.checkin_time = reader.GetString(i); break;
-                            case "sync_time": checkinData.sync_time = reader.GetInt64(i); break;
+                            case "sync_time":
+                                checkinData.sync_time = reader.IsDBNull(i) ? 0 : reader.GetInt64(i); break;
+                            case "sync_from": checkinData.sync_from = reader.GetString(i); break;
                         }
                     }
                     tmpList.Add(checkinData);
@@ -259,6 +262,28 @@ namespace mTicket
                 detail.checkin = tmpList.ToArray();
             }
             return detail;
+        }
+
+        public CodeDataDetail LoadCodeDataDetail(string code)
+        {
+            using (SQLiteCommand cmd = new SQLiteCommand(_conn))
+            {
+                cmd.CommandText = "SELECT * FROM " + CodeTableName + " WHERE code= '" + code+ "'";
+                SQLiteDataReader reader = cmd.ExecuteReader();
+                while (reader.Read())
+                {
+                    for (var i = 0; i < reader.FieldCount; i++)
+                    {
+                        if ("_id".Equals(reader.GetName(i)))
+                        {
+                            int id = reader.GetInt32(i);
+                            return LoadCodeDataDetail(id);
+                        }
+                    }
+                }
+                reader.Close();
+            }
+            return null;
         }
 
         public static void SaveCodeTable(CodeTable codeTable, string path)
@@ -369,6 +394,8 @@ namespace mTicket
             }
             return ret.ToArray();
         }
+        
+        //TODO hasOwnTime not used
         public long SetCheckinDatas(CheckinData[] checkinDatas,string syncFrom, bool hasOwnTime = false)
         {
             long time = TimeTools.CurrentTimeMillis();
@@ -392,7 +419,22 @@ namespace mTicket
             }
             return time;
         }
-        
+
+        public void Checkin(int id, string device)
+        {
+            using (SQLiteCommand cmd = new SQLiteCommand(_conn))
+            {
+                cmd.CommandText = "insert into " + CheckinTableName + " (_id, checkin_time,sync_from) values(@_id, datetime('now', 'localtime'), @sync_from)";
+                
+                cmd.Parameters.AddRange(new[]
+                {
+                    new SQLiteParameter("@_id", id),
+                    new SQLiteParameter("@sync_from",device),
+                });
+                cmd.ExecuteNonQuery();
+            }
+        }
+
         public void Dispose()
         {
             _conn.Close();

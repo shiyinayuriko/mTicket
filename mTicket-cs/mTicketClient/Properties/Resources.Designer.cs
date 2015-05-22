@@ -77,5 +77,23 @@ namespace mTicketClient.Properties {
                 return ResourceManager.GetString("Launcher_EnableSearch_host_not_found", resourceCulture);
             }
         }
+        
+        /// <summary>
+        ///   查找类似 是否更新数据库？ 的本地化字符串。
+        /// </summary>
+        internal static string ServiceContainer_ConnectHost_AskForUpdateDatabase {
+            get {
+                return ResourceManager.GetString("ServiceContainer_ConnectHost_AskForUpdateDatabase", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 发生错误： 的本地化字符串。
+        /// </summary>
+        internal static string ServiceContainer_Error_occurd {
+            get {
+                return ResourceManager.GetString("ServiceContainer_Error_occurd", resourceCulture);
+            }
+        }
     }
 }

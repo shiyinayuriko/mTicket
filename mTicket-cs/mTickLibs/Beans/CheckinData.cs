@@ -10,5 +10,6 @@ namespace mTickLibs.codeData
         public int id;
         public string checkin_time;
         public long sync_time = 0;
+        public String sync_from;
     }
 }

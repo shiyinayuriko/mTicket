@@ -28,7 +28,6 @@ public class LogicChecker {
 		
 		String json = new Gson().toJson(codeData);
 		boolean result = callScript(json);
-		if(result) Database.getInstance(context).checkin(codeData.id);
 		return result;
 	}
 	
