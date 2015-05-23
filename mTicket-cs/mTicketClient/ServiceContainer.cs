@@ -8,6 +8,7 @@ using System.Timers;
 using System.Windows.Forms;
 using mTicket;
 using mTicket.Beans;
+using mTicketClient.Modules;
 using mTicketClient.Properties;
 using mTickLibs.codeData;
 using mTickLibs.Tools;
@@ -32,6 +33,10 @@ namespace mTicketClient
         private LogicChecker _logicChecker;
         public delegate void OnFinishCheckin(bool isSuccess,string code, string device,CodeDataDetail codeData);
         public OnFinishCheckin FinishCheckin;
+
+        public delegate void OnFinishSync(List<CheckinData> checkinDatas);
+        public OnFinishSync FinishSync;
+
         public ServiceContainer(string ipAddr, int port, Form form)
         {
             _tcp = new TcpClient(ipAddr,port);
@@ -85,6 +90,7 @@ namespace mTicketClient
                     UpdateStete("导入数据中");
                     DataBaseHandler.SaveCodeTable(table, path);
                     UpdateStete("导入数据完成");
+                    LocalSettings.SaveSyncTimestamp(0);
                 }
                 _db = DataHandler.getDataBaseHandler(path);
             }
@@ -147,9 +153,9 @@ namespace mTicketClient
                 UpdateStete("链接服务器");
                 string ret = _tcp.Call("syncCheckin", new[]
                 {
-                    TimeTools .GetSyncTimetamp() + "",
+                    LocalSettings.GetSyncTimetamp() + "",
                     JsonConvert.SerializeObject(checkin), 
-                    "notImply"//TempStates.instance(this).getScanLog()
+                    LocalSettings.GetScanLog()
                 });
                 UpdateStete("传输数据完成");
 
@@ -162,9 +168,17 @@ namespace mTicketClient
 
                 UpdateStete("同步数据完成");
 
-                //TODO SyncTime
-//                TempStates.instance(this).clearScanLog();
-//                TempStates.instance(this).setSyncTimetamp(newTimestamp);
+                LocalSettings.SaveSyncTimestamp(newTimestamp);
+                LocalSettings.ClearScanLog();
+                
+                if (_form.InvokeRequired)
+                {
+                    _form.Invoke(new OnFinishSync(FinishSync), retCheckin.ToList());
+                }
+                else
+                {
+                    FinishSync(retCheckin.ToList());
+                }
             }
             catch (Exception e)
             {
@@ -180,6 +194,7 @@ namespace mTicketClient
 
         public void Checkin(string code, string device)
         {
+            LocalSettings.AppendScanLog(device + ":" + code);
             try
             {
                 CodeDataDetail data = _db.LoadCodeDataDetail(code);

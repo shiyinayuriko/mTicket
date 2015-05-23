@@ -22,5 +22,17 @@ namespace mTicketClient.Properties {
                 return defaultInstance;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("0")]
+        public long SyncTime {
+            get {
+                return ((long)(this["SyncTime"]));
+            }
+            set {
+                this["SyncTime"] = value;
+            }
+        }
     }
 }

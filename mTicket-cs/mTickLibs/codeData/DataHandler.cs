@@ -395,7 +395,8 @@ namespace mTicket
                             case "_id": checkinData.id = reader.GetInt32(i); break;
                             case "checkin_time":
                                 checkinData.checkin_time = reader.GetString(i);break;
-                            case "sync_time": checkinData.sync_time = reader.GetInt64(i);break;
+                            case "sync_time": checkinData.sync_time = reader.GetInt64(i); break;
+                            case "sync_from": checkinData.sync_from = reader.IsDBNull(i) ? " " : reader.GetString(i); break;
                         }
                     }
                     ret.Add(checkinData);
@@ -460,7 +461,7 @@ namespace mTicket
                         new SQLiteParameter("@_id", checkinData.id),
                         new SQLiteParameter("@checkin_time", checkinData.checkin_time),
                         new SQLiteParameter("@sync_time",hasOwnTime?checkinData.sync_time:time),
-                        new SQLiteParameter("@sync_from",syncFrom + checkinData.sync_from),
+                        new SQLiteParameter("@sync_from",syncFrom +" " +checkinData.sync_from),
                     });
                     cmd.ExecuteNonQuery();
                 }
@@ -509,7 +510,7 @@ namespace mTicket
                             case "_id": checkinData.id = reader.GetInt32(i); break;
                             case "checkin_time":
                                 checkinData.checkin_time = reader.GetString(i); break;
-                            case "sync_from" : checkinData.sync_from = reader.GetString(i);break;
+                            case "sync_from": checkinData.sync_from = reader.IsDBNull(i) ? " " : reader.GetString(i); break;
                         }
                     }
                     list.Add(checkinData);

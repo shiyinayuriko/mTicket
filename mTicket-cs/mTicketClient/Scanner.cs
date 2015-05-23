@@ -24,7 +24,8 @@ namespace mTicketClient
             {
                 Invoke = OnUpdateState,
                 FinishInitialize = OnFinishInitialize,
-                FinishCheckin = OnFinishCheckin
+                FinishCheckin = OnFinishCheckin,
+                FinishSync = OnFinishSync
             };
 
             Thread t = new Thread(_service.ConnectHost);
@@ -58,7 +59,7 @@ namespace mTicketClient
         private readonly Dictionary<string,KeyHandler> _handlers = new Dictionary<string, KeyHandler>(); 
         private void OnKeyPressed(object sender, RawInputEventArg e)
         {
-            //TODO
+            //TODO not sure Standard PS/2 Keyboard
             if (e.KeyPressEvent.Name.Contains("Standard PS/2 Keyboard")) return;
 
             if (textBox_manually_input.Focused) listView_checkin.Focus();
@@ -71,7 +72,6 @@ namespace mTicketClient
             {
                 Console.WriteLine(ret);
                 _service.Checkin(ret,e.KeyPressEvent.Name);
-//                _service.Checkin("1f7sLEqlW7D2fjZG", "test", OnFinishCheckin);
             }
         }
 
@@ -83,11 +83,43 @@ namespace mTicketClient
             record.SubItems.Add(DateTime.Now.ToString("yyyy-MM-dd hh:mm;ss"));
             record.SubItems.Add(devices);
             listView_checkin.Items.Add(record);
+
+            string str = "扫描结果:" + codes + Environment.NewLine;
+            str += "扫描设备:" + devices + Environment.NewLine;
+            str += isSuccess ? "通过" : "未通过" + Environment.NewLine;
+            if (codeData != null)
+            {
+                foreach (var info in codeData.info)
+                {
+                    str += info.Key + ":" + info.Value + Environment.NewLine;
+                }
+                foreach (var checkinData in codeData.checkin)
+                {
+                    str += checkinData.checkin_time + ":" + checkinData.sync_from;
+                }
+            }
+            text_scan_result.Text =str;
+
+            lable_pass.BackColor = !isSuccess ? Color.Red : SystemColors.Window;
+            lable_pass.Text = isSuccess ? "通过" : "未通过";
         }
         public void InitialListView()
         {
             CheckinData[] checkins = _service.GetCheckinDatas();
             foreach (var checkin in checkins)
+            {
+                var record = new ListViewItem(checkin.id + "");
+                record.SubItems.Add("");
+                record.SubItems.Add("");
+                record.SubItems.Add(checkin.checkin_time);
+                record.SubItems.Add(checkin.sync_from);
+                listView_checkin.Items.Add(record);
+            }
+        }
+
+        public void OnFinishSync(List<CheckinData> checkinDatas)
+        {
+            foreach (var checkin in checkinDatas)
             {
                 var record = new ListViewItem(checkin.id + "");
                 record.SubItems.Add("");

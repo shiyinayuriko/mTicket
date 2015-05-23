@@ -23,7 +23,7 @@ namespace mTicket
             {
                 var record = new ListViewItem(checkin.id + "");
                 record.SubItems.Add(checkin.checkin_time);
-                record.SubItems.Add("default");
+                record.SubItems.Add(checkin.sync_from);
                 record.SubItems.Add(checkin.sync_time+"");
                 _liseview.Items.Add(record);
             }
@@ -44,7 +44,7 @@ namespace mTicket
             {
                 var record = new ListViewItem(checkin.id + "");
                 record.SubItems.Add(checkin.checkin_time);
-                record.SubItems.Add(endPointName);
+                record.SubItems.Add(endPointName + " " + checkin.sync_from);
                 record.SubItems.Add(timestamp+"");
                 _liseview.Items.Add(record);
             }
