@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Windows.Forms;
+using mTickLibs.IcCardAdapter;
 
 namespace mTicketClient
 {
@@ -16,14 +17,14 @@ namespace mTicketClient
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
             
-//            Launcher lancher = new Launcher();
-//            lancher.ShowDialog();
-//            if (lancher.DialogResult == DialogResult.OK)
-//            {
-//                Application.Run(new Scanner(lancher.ResultIpAddr,lancher.ResultPort));
-//            }
+            Launcher lancher = new Launcher();
+            lancher.ShowDialog();
+            if (lancher.DialogResult == DialogResult.OK)
+            {
+                Application.Run(new Scanner(lancher.ResultIpAddr,lancher.ResultPort));
+            }
 
-            Application.Run(new Scanner("127.0.0.1", 8000));
+//            Application.Run(new Scanner("127.0.0.1", 8000));
         }
     }
 }

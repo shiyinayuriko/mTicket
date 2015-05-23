@@ -11,6 +11,7 @@ using mTicket.Beans;
 using mTicketClient.Modules;
 using mTicketClient.Properties;
 using mTickLibs.codeData;
+using mTickLibs.IcCardAdapter;
 using mTickLibs.Tools;
 using Microsoft.Win32;
 using Newtonsoft.Json;
@@ -213,6 +214,27 @@ namespace mTicketClient
                 MessageBox.Show(e.StackTrace);
             }
 
+        }
+
+        public byte[][] CheckinIc(string code, byte[][] bytes)
+        {
+            IcCardStruct icCard = IcCardBean.FromByte(IcCardBean.GetBytesLine(bytes));
+           
+            LocalSettings.AppendScanLog(String.Format("IC:{0} {1} {2}", code, icCard.CanIn?"in":"out",icCard.LastTime));
+
+
+            CodeDataDetail data = _db.LoadCodeDataDetail(code);
+            bool isPass = _logicChecker.Checkin(data, icCard);
+            if (isPass)
+            {
+                _db.Checkin(data.id, "IC" + (icCard.CanIn ? "in" : "out"));
+             
+                icCard.Id = data.id;
+                icCard.LastTime = TimeTools.CurrentTimeMillis();
+                icCard.CanIn = !icCard.CanIn;
+            }
+            byte[][] ret = IcCardBean.CopyToBytes(IcCardBean.ToBytes(icCard), bytes);
+            return ret;
         }
 
         private void UpdateStete(string message)

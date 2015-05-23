@@ -9,6 +9,7 @@ using System.Threading;
 using System.Windows.Forms;
 using mTicket.Beans;
 using mTickLibs.codeData;
+using mTickLibs.IcCardAdapter;
 using RawInput_dll;
 
 namespace mTicketClient
@@ -54,6 +55,15 @@ namespace mTicketClient
 //            rawinput.AddMessageFilter();
             Win32.DeviceAudit();
             rawinput.KeyPressed += OnKeyPressed;
+
+            var loader = new LoaderManager();
+            loader.DealwithCard = DealwithCard;
+            loader.StartAutoLoad();
+        }
+        private byte[][] DealwithCard(AbstractIcCard card)
+        {
+            var ret = _service.CheckinIc(card.GetIdHex(), card.GetData());
+            return ret;
         }
 
         private readonly Dictionary<string,KeyHandler> _handlers = new Dictionary<string, KeyHandler>(); 
@@ -163,5 +173,10 @@ namespace mTicketClient
             }
         }
 
+        protected override void OnClosed(EventArgs e)
+        {
+            base.OnClosed(e);
+            Environment.Exit(0);
+        }
     }
 }
