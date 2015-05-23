@@ -8,6 +8,7 @@ import net.whitecomet.mticket.data.Database;
 import net.whitecomet.mticket.data.TempStates;
 import net.whitecomet.mticket.data.beans.CheckinData;
 import net.whitecomet.mticket.data.beans.CodeDataReturn;
+import net.whitecomet.mticket.nfc.CardBean;
 import net.whitecomet.mticket.nfc.NfcManager;
 import net.whitecomet.mticket.scanner.CaptureActivity;
 import android.support.v7.app.ActionBarActivity;
@@ -331,10 +332,35 @@ public class MainActivity extends ActionBarActivity {
 		nfc.onPause(this);
 	}
 	private void dealWithNfc(Intent intent){
+		//TODO NULL?
+		if(intent == null) return;
 		if(intent.getAction().equals(NfcAdapter.ACTION_TECH_DISCOVERED)
 		|| intent.getAction().equals(NfcAdapter.ACTION_TAG_DISCOVERED)
 		){
-			nfc.dealwithIntent(intent);
+			
+			if(TempStates.instance(this).severSettings==null) {
+				textLastCheckCode.setText(getString(R.string.textview_checkCode_noConnection));
+				return;
+			}
+			
+			nfc.dealwithIntent(intent,new Handler(){
+				@Override
+				public void handleMessage(Message msg) {
+					super.handleMessage(msg);
+					
+					Bundle data = msg.getData();
+					
+					CodeDataReturn lastCheckCodeData = (CodeDataReturn) data.getSerializable("lastCheckCodeData");
+					String lastCheckCode = data.getString("checkCode");
+					CardBean card = (CardBean) data.getSerializable("cardBean");
+					if(lastCheckCode!=null) textLastCheckCode.setText(lastCheckCode);
+					if(lastCheckCodeData!=null){
+						textLastCheckCodeData.setText(card.toString()+lastCheckCodeData.toString());
+					}else{
+						textLastCheckCodeData.setText(getString(R.string.textview_checkCodeData_default));
+					}
+				}
+			});
 		}
 	}
 }
