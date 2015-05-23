@@ -220,18 +220,18 @@ namespace mTicketClient
         {
             IcCardStruct icCard = IcCardBean.FromByte(IcCardBean.GetBytesLine(bytes));
            
-            LocalSettings.AppendScanLog(String.Format("IC:{0} {1} {2}", code, icCard.CanIn?"in":"out",icCard.LastTime));
+            LocalSettings.AppendScanLog(String.Format("IC:{0} {1} {2}", code, icCard.canIn?"in":"out",icCard.lastTime));
 
 
             CodeDataDetail data = _db.LoadCodeDataDetail(code);
             bool isPass = _logicChecker.Checkin(data, icCard);
             if (isPass)
             {
-                _db.Checkin(data.id, "IC" + (icCard.CanIn ? "in" : "out"));
+                _db.Checkin(data.id, "IC" + (icCard.canIn ? "in" : "out"));
              
-                icCard.Id = data.id;
-                icCard.LastTime = TimeTools.CurrentTimeMillis();
-                icCard.CanIn = !icCard.CanIn;
+                icCard.id = data.id;
+                icCard.lastTime = TimeTools.CurrentTimeMillis();
+                icCard.canIn = !icCard.canIn;
             }
             byte[][] ret = IcCardBean.CopyToBytes(IcCardBean.ToBytes(icCard), bytes);
             return ret;

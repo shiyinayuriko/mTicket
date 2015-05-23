@@ -78,8 +78,8 @@ namespace mTickLibs.IcCardAdapter
     [Serializable]
     public struct IcCardStruct
     {
-        public int Id;
-        public bool CanIn;
-        public long LastTime;
+        public int id;
+        public bool canIn;
+        public long lastTime;
     }
 }
