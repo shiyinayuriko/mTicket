@@ -7,7 +7,7 @@ using System.Threading;
 
 namespace mTicket.Beans
 {
-    class Log
+    public class LogTools
     {
         private const int LockOverTime = 10000;
 

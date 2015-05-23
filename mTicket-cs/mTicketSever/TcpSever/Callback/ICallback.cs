@@ -7,6 +7,7 @@ using System.Text;
 using System.Threading;
 using System.Windows.Forms;
 using mTicket.Beans;
+using mTickLibs.Tools;
 
 namespace mTicket
 {
@@ -31,7 +32,7 @@ namespace mTicket
             line += "Send:" + ret2 + Environment.NewLine ;
             _textLogBox.AppendText(line + Environment.NewLine);
             //TODO should implement in codeTableCallback
-            Log.NetLog(info + Environment.NewLine + "Recieve:" + reciveString + Environment.NewLine + "Send:" + (reciveString.StartsWith("codeTable") ? ret2 : ret) + Environment.NewLine);
+            LogTools.NetLog(info + Environment.NewLine + "Recieve:" + reciveString + Environment.NewLine + "Send:" + (reciveString.StartsWith("codeTable") ? ret2 : ret) + Environment.NewLine);
 
         }
         
@@ -46,16 +47,16 @@ namespace mTicket
             var commandParams = new string[cmds.Length-2];
             for (int i = 2; i < cmds.Length; i++)
             {
-                commandParams[i - 2] = FromBase64(cmds[i]);
+                commandParams[i - 2] = Base64Tools.FromBase64(cmds[i]);
             }
 
-            var endPointName =  FromBase64(cmds[1]);
+            var endPointName = Base64Tools.FromBase64(cmds[1]);
             string ret = OnDealCommand(cmds[0],commandParams, endPointName, e.EndPoint);
 
             string nI = string.Join(" ", commandParams);
             UpdateLine(cmds[0] + " " + nI, ret, endPointName, e.EndPoint);
 
-            return ToBase64(ret);
+            return Base64Tools.ToBase64(ret);
         }
 
 
@@ -74,18 +75,5 @@ namespace mTicket
       
         }
 
-
-
-        protected static string ToBase64(string str)
-        {
-            byte[] bytes = Encoding.Default.GetBytes(str);
-            return Convert.ToBase64String(bytes);
-        }
-
-        protected static string FromBase64(string base64)
-        {
-            byte[] outputb = Convert.FromBase64String(base64);
-            return Encoding.UTF8.GetString(outputb);
-        }
     }
 }

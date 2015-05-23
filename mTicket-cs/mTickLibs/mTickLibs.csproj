@@ -25,7 +25,7 @@
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>none</DebugType>
     <Optimize>true</Optimize>
-    <OutputPath>..\..\Release\win\</OutputPath>
+    <OutputPath>..\..\Release\win\Lib\</OutputPath>
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
@@ -80,12 +80,27 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="codeData\CheckinData.cs" />
-    <Compile Include="codeData\CodeDataDetail.cs" />
-    <Compile Include="codeData\CodeTable.cs" />
+    <Compile Include="Beans\Settings.cs" />
+    <Compile Include="Beans\CheckinData.cs" />
+    <Compile Include="Beans\CodeDataDetail.cs" />
+    <Compile Include="Beans\CodeTable.cs" />
     <Compile Include="codeData\DataHandler.cs" />
+    <Compile Include="IcCardAdapter\Cards\AbstractIcCard.cs" />
+    <Compile Include="IcCardAdapter\Cards\DefaultIcCard.cs" />
+    <Compile Include="IcCardAdapter\Cards\MifareUltralightIcCard.cs" />
+    <Compile Include="IcCardAdapter\Cards\MifareOneIcCard.cs" />
+    <Compile Include="IcCardAdapter\IcCardBean.cs" />
+    <Compile Include="IcCardAdapter\IcCardException.cs" />
+    <Compile Include="IcCardAdapter\LoaderDll.cs" />
+    <Compile Include="IcCardAdapter\LoaderManager.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Tools\Base64Tools.cs" />
     <Compile Include="Tools\IpTools.cs" />
+    <Compile Include="Tools\LogTools.cs" />
+    <Compile Include="Tools\TimeTools.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="umf.dll" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

@@ -61,11 +61,38 @@ namespace mTicketClient.Properties {
         }
         
         /// <summary>
+        ///   查找类似 服务器设置错误 的本地化字符串。
+        /// </summary>
+        internal static string Launcher_button_connect_Click_error_host_settings {
+            get {
+                return ResourceManager.GetString("Launcher_button_connect_Click_error_host_settings", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   查找类似 未找到服务器 的本地化字符串。
         /// </summary>
         internal static string Launcher_EnableSearch_host_not_found {
             get {
                 return ResourceManager.GetString("Launcher_EnableSearch_host_not_found", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 是否更新数据库？ 的本地化字符串。
+        /// </summary>
+        internal static string ServiceContainer_ConnectHost_AskForUpdateDatabase {
+            get {
+                return ResourceManager.GetString("ServiceContainer_ConnectHost_AskForUpdateDatabase", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 发生错误： 的本地化字符串。
+        /// </summary>
+        internal static string ServiceContainer_Error_occurd {
+            get {
+                return ResourceManager.GetString("ServiceContainer_Error_occurd", resourceCulture);
             }
         }
     }

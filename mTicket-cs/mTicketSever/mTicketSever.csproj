@@ -71,7 +71,6 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Beans\Log.cs" />
     <Compile Include="Form1.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -85,8 +84,8 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="TcpSever\Callback\PingCallback.cs" />
     <Compile Include="TcpSever\Callback\SyncCallback.cs" />
-    <Compile Include="Beans\SettingBean.cs" />
-    <Compile Include="Beans\SocketBackEventArgs.cs" />
+    <Compile Include="SettingBean.cs" />
+    <Compile Include="TcpSever\SocketBackEventArgs.cs" />
     <Compile Include="TcpSever\HostNameHolder.cs" />
     <Compile Include="TcpSever\TcpSever.cs" />
     <EmbeddedResource Include="Form1.resx">

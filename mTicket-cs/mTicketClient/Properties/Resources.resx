@@ -117,4 +117,13 @@
   <data name="Launcher_EnableSearch_host_not_found" xml:space="preserve">
     <value>未找到服务器</value>
   </data>
+  <data name="Launcher_button_connect_Click_error_host_settings" xml:space="preserve">
+    <value>服务器设置错误</value>
+  </data>
+  <data name="ServiceContainer_Error_occurd" xml:space="preserve">
+    <value>发生错误：</value>
+  </data>
+  <data name="ServiceContainer_ConnectHost_AskForUpdateDatabase" xml:space="preserve">
+    <value>是否更新数据库？</value>
+  </data>
 </root>

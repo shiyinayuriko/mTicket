@@ -9,6 +9,7 @@ using System.Text;
 using System.Xml.Linq;
 using mTicket.Beans;
 using mTickLibs.codeData;
+using mTickLibs.Tools;
 using NPOI.HSSF.UserModel;
 using NPOI.SS.UserModel;
 using NPOI.XSSF.UserModel;
@@ -199,6 +200,7 @@ namespace mTicket
                     }
                     reader.Close();
                 }
+                _columns = columnsTmp;
             }
 
             CodeDataDetail detail = new CodeDataDetail();
@@ -249,7 +251,19 @@ namespace mTicket
                             case "_id": checkinData.id = reader.GetInt32(i); break;
                             case "checkin_time":
                                 checkinData.checkin_time = reader.GetString(i); break;
-                            case "sync_time": checkinData.sync_time = reader.GetInt64(i); break;
+                            case "sync_time":
+                            {
+                                try
+                                {
+                                    checkinData.sync_time = reader.GetInt64(i);
+                                }
+                                catch (Exception)
+                                {
+                                    checkinData.sync_time = 0;
+                                }
+                                break;
+                            }
+                            case "sync_from": checkinData.sync_from = reader.IsDBNull(i)?" ":reader.GetString(i); break;
                         }
                     }
                     tmpList.Add(checkinData);
@@ -258,6 +272,28 @@ namespace mTicket
                 detail.checkin = tmpList.ToArray();
             }
             return detail;
+        }
+
+        public CodeDataDetail LoadCodeDataDetail(string code)
+        {
+            using (SQLiteCommand cmd = new SQLiteCommand(_conn))
+            {
+                cmd.CommandText = "SELECT * FROM " + CodeTableName + " WHERE code= '" + code+ "'";
+                SQLiteDataReader reader = cmd.ExecuteReader();
+                while (reader.Read())
+                {
+                    for (var i = 0; i < reader.FieldCount; i++)
+                    {
+                        if ("_id".Equals(reader.GetName(i)))
+                        {
+                            int id = reader.GetInt32(i);
+                            return LoadCodeDataDetail(id);
+                        }
+                    }
+                }
+                reader.Close();
+            }
+            return null;
         }
 
         public static void SaveCodeTable(CodeTable codeTable, string path)
@@ -359,7 +395,8 @@ namespace mTicket
                             case "_id": checkinData.id = reader.GetInt32(i); break;
                             case "checkin_time":
                                 checkinData.checkin_time = reader.GetString(i);break;
-                            case "sync_time": checkinData.sync_time = reader.GetInt64(i);break;
+                            case "sync_time": checkinData.sync_time = reader.GetInt64(i); break;
+                            case "sync_from": checkinData.sync_from = reader.IsDBNull(i) ? " " : reader.GetString(i); break;
                         }
                     }
                     ret.Add(checkinData);
@@ -368,9 +405,50 @@ namespace mTicket
             }
             return ret.ToArray();
         }
+        public CheckinData[] GetAllCheckinDatas()
+        {
+            List<CheckinData> ret = new List<CheckinData>();
+            using (SQLiteCommand cmd = new SQLiteCommand(_conn))
+            {
+                cmd.CommandText = "SELECT * FROM " + CheckinTableName;
+                SQLiteDataReader reader = cmd.ExecuteReader();
+                while (reader.Read())
+                {
+                    CheckinData checkinData = new CheckinData();
+                    for (var i = 0; i < reader.FieldCount; i++)
+                    {
+                        string filedName = reader.GetName(i);
+                        switch (filedName)
+                        {
+                            case "_id": checkinData.id = reader.GetInt32(i); break;
+                            case "checkin_time":
+                                checkinData.checkin_time = reader.GetString(i); break;
+                            case "sync_time":
+                            {
+                                try
+                                {
+                                    checkinData.sync_time = reader.GetInt64(i);
+                                }
+                                catch (Exception)
+                                {
+                                    checkinData.sync_time = 0;
+                                }
+                                break;
+                            }
+                            case "sync_from": checkinData.sync_from = reader.IsDBNull(i)?" ":reader.GetString(i); break;
+                        }
+                    }
+                    ret.Add(checkinData);
+                }
+                reader.Close();
+            }
+            return ret.ToArray();
+        }
+        
+        //TODO hasOwnTime not used
         public long SetCheckinDatas(CheckinData[] checkinDatas,string syncFrom, bool hasOwnTime = false)
         {
-            long time = Convert.ToInt64((DateTime.UtcNow - new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc)).TotalMilliseconds);
+            long time = TimeTools.CurrentTimeMillis();
 
             using (SQLiteCommand cmd = new SQLiteCommand(_conn))
             {
@@ -383,7 +461,7 @@ namespace mTicket
                         new SQLiteParameter("@_id", checkinData.id),
                         new SQLiteParameter("@checkin_time", checkinData.checkin_time),
                         new SQLiteParameter("@sync_time",hasOwnTime?checkinData.sync_time:time),
-                        new SQLiteParameter("@sync_from",syncFrom),
+                        new SQLiteParameter("@sync_from",syncFrom +" " +checkinData.sync_from),
                     });
                     cmd.ExecuteNonQuery();
                 }
@@ -391,7 +469,91 @@ namespace mTicket
             }
             return time;
         }
-        
+
+        public void Checkin(int id, string device)
+        {
+            using (SQLiteCommand cmd = new SQLiteCommand(_conn))
+            {
+                cmd.CommandText = "insert into " + CheckinTableName + " (_id, checkin_time,sync_from) values(@_id, datetime('now', 'localtime'), @sync_from)";
+                
+                cmd.Parameters.AddRange(new[]
+                {
+                    new SQLiteParameter("@_id", id),
+                    new SQLiteParameter("@sync_from",device),
+                });
+                cmd.ExecuteNonQuery();
+            }
+        }
+
+
+        public CheckinData[] MarkUnsynced()
+        {
+            List<CheckinData> list = new List<CheckinData>();
+            using (SQLiteCommand cmd = new SQLiteCommand(_conn))
+            {
+                cmd.CommandText = "UPDATE " + CheckinTableName + " SET sync_time = '-' WHERE sync_time is NULL;";
+                cmd.ExecuteNonQuery();
+            }
+
+            using (SQLiteCommand cmd = new SQLiteCommand(_conn))
+            {
+                cmd.CommandText = "SELECT * FROM " + CheckinTableName + " WHERE sync_time = '-';";
+                SQLiteDataReader reader = cmd.ExecuteReader();
+                while (reader.Read())
+                {
+                    CheckinData checkinData = new CheckinData();
+                    for (var i = 0; i < reader.FieldCount; i++)
+                    {
+                        string filedName = reader.GetName(i);
+                        switch (filedName)
+                        {
+                            case "_id": checkinData.id = reader.GetInt32(i); break;
+                            case "checkin_time":
+                                checkinData.checkin_time = reader.GetString(i); break;
+                            case "sync_from": checkinData.sync_from = reader.IsDBNull(i) ? " " : reader.GetString(i); break;
+                        }
+                    }
+                    list.Add(checkinData);
+                }
+                reader.Close();
+            }
+            return list.ToArray();
+        }
+
+        public void SetMarksSynced(long timestamp)
+        {
+            using (SQLiteCommand cmd = new SQLiteCommand(_conn))
+            {
+                cmd.CommandText = "UPDATE " + CheckinTableName + " SET sync_time = @sync_time WHERE sync_time = '-';";
+                cmd.Parameters.Add(new SQLiteParameter("@sync_time", timestamp+""));
+                cmd.ExecuteNonQuery();
+            }
+        }
+
+        public void AddSyncedCheckinData(CheckinData[] checkinDatas)
+        {
+            using (SQLiteCommand cmd = new SQLiteCommand(_conn))
+            {
+                var transaction = _conn.BeginTransaction();
+                cmd.CommandText = "insert into " + CheckinTableName + "(_id,checkin_time,sync_time,sync_from) values(@_id,@checkin_time,@sync_time,@sync_from)";
+
+                foreach (var checkinData in checkinDatas)
+                {
+                    cmd.Parameters.AddRange(new[]
+                    {
+                        new SQLiteParameter("@_id", checkinData.id),
+                        new SQLiteParameter("@checkin_time", checkinData.checkin_time),
+                        new SQLiteParameter("@sync_time", checkinData.sync_time),
+                        new SQLiteParameter("@sync_from", checkinData.sync_from),
+                    });
+                    cmd.ExecuteNonQuery();
+                }
+                transaction.Commit();
+            }
+        }
+
+
+
         public void Dispose()
         {
             _conn.Close();

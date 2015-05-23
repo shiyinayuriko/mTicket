@@ -6,28 +6,17 @@ using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Windows.Forms;
+using mTickLibs.Beans;
 using Newtonsoft.Json;
 
 namespace mTicket
 {
-    class SettingBean
+    class SettingCountainer:Settings
     {
         [JsonIgnore]
-        public static readonly SettingBean Instance = GetSettings();
+        public static readonly Settings Instance = GetSettings();
 
-        public int timer;
-        public int proress_step_update_database;
-        public int tcp_timeout;
-        public string checkin_logic;
-        public long restart_scanner_delay;
-
-        public string GetJson()
-        {
-            var serialStr = JsonConvert.SerializeObject(this);
-            return serialStr;
-        }
-
-        public static SettingBean GetSettings()
+        public static Settings GetSettings()
         {
             string tmp;
             try
@@ -41,7 +30,7 @@ namespace mTicket
                 tmp = Properties.Resources.checkinLogic;
             }
             tmp = Regex.Replace(tmp, "[\r\n]", "");
-            var ret = new SettingBean
+            var ret = new Settings
             {
                 timer = Convert.ToInt32(ConfigurationManager.AppSettings["timer"]),
                 proress_step_update_database = Convert.ToInt32(ConfigurationManager.AppSettings["proress_step_update_database"]),
