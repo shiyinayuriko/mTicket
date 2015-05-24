@@ -457,6 +457,7 @@ public final class CaptureActivity extends Activity implements
 			bottom_detail.setText(codeData==null?code:codeData.toString());
 			boolean isPass = logicChecker.checkin(codeData);
 			if(isPass){
+				Database.getInstance(this).checkin(codeData.id);
 				restartPreviewAfterDelay(TempStates.instance(this).severSettings.restart_scanner_delay);
 			}else{
 				AlertDialog.Builder builder = new AlertDialog.Builder(this);

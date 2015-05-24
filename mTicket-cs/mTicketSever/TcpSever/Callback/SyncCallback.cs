@@ -18,12 +18,12 @@ namespace mTicket
         {
             _db = db;
             _liseview = liseview;
-            CheckinData[] checkins = _db.GetCheckinDatas(0);
+            CheckinData[] checkins = _db.GetAllCheckinDatas();
             foreach (var checkin in checkins)
             {
                 var record = new ListViewItem(checkin.id + "");
                 record.SubItems.Add(checkin.checkin_time);
-                record.SubItems.Add("default");
+                record.SubItems.Add(checkin.sync_from);
                 record.SubItems.Add(checkin.sync_time+"");
                 _liseview.Items.Add(record);
             }
@@ -38,13 +38,13 @@ namespace mTicket
             CheckinData[] checkins = JsonConvert.DeserializeObject<CheckinData[]>(json);
             long newTimestamp = _db.SetCheckinDatas(checkins, endPointName);
 
-            Log.ScanLog(endPointName,commandParams[2]);
+            LogTools.ScanLog(endPointName,commandParams[2]);
 
             foreach (var checkin in checkins)
             {
                 var record = new ListViewItem(checkin.id + "");
                 record.SubItems.Add(checkin.checkin_time);
-                record.SubItems.Add(endPointName);
+                record.SubItems.Add(endPointName + " " + checkin.sync_from);
                 record.SubItems.Add(timestamp+"");
                 _liseview.Items.Add(record);
             }

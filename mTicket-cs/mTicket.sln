@@ -5,9 +5,9 @@ VisualStudioVersion = 12.0.31101.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "mTicketSever", "mTicketSever\mTicketSever.csproj", "{98F4BADD-08DE-41BA-8095-86D8C88A020D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "mTicketImporter", "mTicketImporter\mTicketImporter.csproj", "{BF337D9E-6A69-46E3-999E-A2D9D64637E0}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "mTickLibs", "mTickLibs\mTickLibs.csproj", "{983B0204-7D60-4046-A9B5-1DC7CFFF40E3}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "mTicketClient", "mTicketClient\mTicketClient.csproj", "{32A267BF-708A-485D-BB00-42A5CDC4C1C3}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -31,18 +31,6 @@ Global
 		{98F4BADD-08DE-41BA-8095-86D8C88A020D}.Release|Mixed Platforms.Build.0 = Release|x86
 		{98F4BADD-08DE-41BA-8095-86D8C88A020D}.Release|x86.ActiveCfg = Release|x86
 		{98F4BADD-08DE-41BA-8095-86D8C88A020D}.Release|x86.Build.0 = Release|x86
-		{BF337D9E-6A69-46E3-999E-A2D9D64637E0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{BF337D9E-6A69-46E3-999E-A2D9D64637E0}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{BF337D9E-6A69-46E3-999E-A2D9D64637E0}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
-		{BF337D9E-6A69-46E3-999E-A2D9D64637E0}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
-		{BF337D9E-6A69-46E3-999E-A2D9D64637E0}.Debug|x86.ActiveCfg = Debug|x86
-		{BF337D9E-6A69-46E3-999E-A2D9D64637E0}.Debug|x86.Build.0 = Debug|x86
-		{BF337D9E-6A69-46E3-999E-A2D9D64637E0}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{BF337D9E-6A69-46E3-999E-A2D9D64637E0}.Release|Any CPU.Build.0 = Release|Any CPU
-		{BF337D9E-6A69-46E3-999E-A2D9D64637E0}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
-		{BF337D9E-6A69-46E3-999E-A2D9D64637E0}.Release|Mixed Platforms.Build.0 = Release|Any CPU
-		{BF337D9E-6A69-46E3-999E-A2D9D64637E0}.Release|x86.ActiveCfg = Release|x86
-		{BF337D9E-6A69-46E3-999E-A2D9D64637E0}.Release|x86.Build.0 = Release|x86
 		{983B0204-7D60-4046-A9B5-1DC7CFFF40E3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{983B0204-7D60-4046-A9B5-1DC7CFFF40E3}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{983B0204-7D60-4046-A9B5-1DC7CFFF40E3}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
@@ -55,6 +43,18 @@ Global
 		{983B0204-7D60-4046-A9B5-1DC7CFFF40E3}.Release|Mixed Platforms.Build.0 = Release|Any CPU
 		{983B0204-7D60-4046-A9B5-1DC7CFFF40E3}.Release|x86.ActiveCfg = Release|Any CPU
 		{983B0204-7D60-4046-A9B5-1DC7CFFF40E3}.Release|x86.Build.0 = Release|Any CPU
+		{32A267BF-708A-485D-BB00-42A5CDC4C1C3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{32A267BF-708A-485D-BB00-42A5CDC4C1C3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{32A267BF-708A-485D-BB00-42A5CDC4C1C3}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{32A267BF-708A-485D-BB00-42A5CDC4C1C3}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{32A267BF-708A-485D-BB00-42A5CDC4C1C3}.Debug|x86.ActiveCfg = Debug|x86
+		{32A267BF-708A-485D-BB00-42A5CDC4C1C3}.Debug|x86.Build.0 = Debug|x86
+		{32A267BF-708A-485D-BB00-42A5CDC4C1C3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{32A267BF-708A-485D-BB00-42A5CDC4C1C3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{32A267BF-708A-485D-BB00-42A5CDC4C1C3}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{32A267BF-708A-485D-BB00-42A5CDC4C1C3}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{32A267BF-708A-485D-BB00-42A5CDC4C1C3}.Release|x86.ActiveCfg = Release|x86
+		{32A267BF-708A-485D-BB00-42A5CDC4C1C3}.Release|x86.Build.0 = Release|x86
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

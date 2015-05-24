@@ -72,5 +72,32 @@ namespace mTicket.Properties {
                 return ResourceManager.GetString("checkinLogic", resourceCulture);
             }
         }
+        
+        /// <summary>
+        ///   查找类似 数据源不匹配 的本地化字符串。
+        /// </summary>
+        internal static string Form1_ImportData_DataSauce_not_match {
+            get {
+                return ResourceManager.GetString("Form1_ImportData_DataSauce_not_match", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 添加{0}条数据，共{1}条数据，抛弃{2}条数据 的本地化字符串。
+        /// </summary>
+        internal static string Form1_ImportData_ReportMessage {
+            get {
+                return ResourceManager.GetString("Form1_ImportData_ReportMessage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 导入文件格式错误 的本地化字符串。
+        /// </summary>
+        internal static string Form1_Tab_import_DragDrop_error_filename_extension {
+            get {
+                return ResourceManager.GetString("Form1_Tab_import_DragDrop_error_filename_extension", resourceCulture);
+            }
+        }
     }
 }

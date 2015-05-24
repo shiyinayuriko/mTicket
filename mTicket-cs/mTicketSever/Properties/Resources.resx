@@ -121,4 +121,13 @@
   <data name="checkinLogic" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\checkinlogic.js;System.String, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
   </data>
+  <data name="Form1_Tab_import_DragDrop_error_filename_extension" xml:space="preserve">
+    <value>导入文件格式错误</value>
+  </data>
+  <data name="Form1_ImportData_DataSauce_not_match" xml:space="preserve">
+    <value>数据源不匹配</value>
+  </data>
+  <data name="Form1_ImportData_ReportMessage" xml:space="preserve">
+    <value>添加{0}条数据，共{1}条数据，抛弃{2}条数据</value>
+  </data>
 </root>

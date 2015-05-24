@@ -45,7 +45,7 @@ namespace mTicket
             }
             catch(Exception e)
             {
-                Log.ErrorLog(e.Message);
+                LogTools.ErrorLog(e.Message);
             }
         }
 

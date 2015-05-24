@@ -4,10 +4,13 @@ import java.io.Serializable;
 import java.util.Random;
 
 import net.whitecomet.mticket.ConnectionService.ConnectionServiceBinder;
+import net.whitecomet.mticket.R.string;
 import net.whitecomet.mticket.data.Database;
 import net.whitecomet.mticket.data.TempStates;
 import net.whitecomet.mticket.data.beans.CheckinData;
 import net.whitecomet.mticket.data.beans.CodeDataReturn;
+import net.whitecomet.mticket.nfc.CardBean;
+import net.whitecomet.mticket.nfc.NfcManager;
 import net.whitecomet.mticket.scanner.CaptureActivity;
 import android.support.v7.app.ActionBarActivity;
 import android.app.AlertDialog;
@@ -18,6 +21,7 @@ import android.content.DialogInterface.OnClickListener;
 import android.content.res.Configuration;
 import android.content.Intent;
 import android.content.ServiceConnection;
+import android.nfc.NfcAdapter;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
@@ -48,6 +52,9 @@ public class MainActivity extends ActionBarActivity {
 		
 		textLastCheckCode = (TextView) findViewById(R.id.text_lastCheckCode);
 		textLastCheckCodeData = (TextView) findViewById(R.id.text_lastCheckCodeData);
+		
+		nfc = new NfcManager(this);
+		dealWithNfc(getIntent());
 	}
 
 	@Override
@@ -305,5 +312,67 @@ public class MainActivity extends ActionBarActivity {
 		builder.setTitle("checkin");
 		builder.setMessage(id+"");
 		builder.show();
+	}
+	
+	private NfcManager nfc;
+	@Override
+	protected void onNewIntent(Intent intent) {
+		super.onNewIntent(intent);
+		setIntent(intent);
+		dealWithNfc(intent);
+	}
+	
+	@Override
+	protected void onResume() {
+		super.onResume();
+		nfc.onResume(this);
+	}
+	@Override
+	protected void onPause() {
+		super.onPause();
+		nfc.onPause(this);
+	}
+	private void dealWithNfc(Intent intent){
+		//TODO NULL?
+		if(intent == null) return;
+		if(intent.getAction().equals(NfcAdapter.ACTION_TECH_DISCOVERED)
+		|| intent.getAction().equals(NfcAdapter.ACTION_TAG_DISCOVERED)
+		){
+			
+			if(TempStates.instance(this).severSettings==null) {
+				textLastCheckCode.setText(getString(R.string.textview_checkCode_noConnection));
+				return;
+			}
+			
+			nfc.dealwithIntent(intent,new Handler(){
+				@Override
+				public void handleMessage(Message msg) {
+					super.handleMessage(msg);
+					switch (msg.what) {
+					case 0:
+					case 1:
+						Bundle data = msg.getData();
+						CodeDataReturn checkCodeData = (CodeDataReturn) data.getSerializable("lastCheckCodeData");
+						String lastCheckCode = data.getString("checkCode");
+						CardBean card = (CardBean) data.getSerializable("cardBean");
+						if(lastCheckCode!=null) textLastCheckCode.setText(lastCheckCode+(msg.what==0?"(通过)":"(未通过)"));
+						if(checkCodeData!=null){
+							textLastCheckCodeData.setText(card.toString()+checkCodeData.toString());
+						}else{
+							textLastCheckCodeData.setText(card.toString());
+						}
+						break;
+					case 2:
+						AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+						builder.setTitle(getString(R.string.AlertDialog_checkResult_title_failure));
+						builder.setNeutralButton(getString(R.string.close), null);
+						builder.setMessage(getString(R.string.AlertDialog_checkResult_content_3));
+						builder.show();
+						break;
+					}
+
+				}
+			});
+		}
 	}
 }
