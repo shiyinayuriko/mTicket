@@ -5,6 +5,7 @@ import java.util.Arrays;
 
 import net.whitecomet.mticket.MainActivity;
 import net.whitecomet.mticket.data.Database;
+import net.whitecomet.mticket.data.TempStates;
 import net.whitecomet.mticket.data.beans.CodeDataReturn;
 import net.whitecomet.mticket.logic.LogicChecker;
 import net.whitecomet.mticket.logic.LogicException;
@@ -60,21 +61,25 @@ public class NfcManager {
 	private LogicChecker logicChecker;
 	public void dealwithIntent(Intent intent, Handler handler){
 		Tag tag = intent.getParcelableExtra(NfcAdapter.EXTRA_TAG);
-		Toast.makeText(context, intent.getAction(), Toast.LENGTH_LONG).show();
 		
+		Bundle bundle = new Bundle();
 		try {
 			AbstractNfcCard card = AbstractNfcCard.getNfcCard(tag);
+			
 			byte[] data = card.getData();
-			CardBean cardBean = CardBean.fromBytes(data);
-			
-
-			CodeDataReturn codeData = Database.getInstance(context).getCodeInfo(card.getIdHex());
-			boolean isPass = logicChecker.checkin(codeData,cardBean);
-			
-			Bundle bundle = new Bundle();
-			bundle.putSerializable("lastCheckCodeData", codeData);
 			bundle.putString("checkCode", card.getIdHex());
+			
+			CardBean cardBean = CardBean.fromBytes(data);
 			bundle.putSerializable("cardBean", cardBean.clone());
+			
+			TempStates.instance(context).appendScanLog("IC:"+(cardBean.canIn?"in":"out")+cardBean.lastTime);
+			
+			CodeDataReturn codeData = Database.getInstance(context).getCodeInfo(card.getIdHex());
+			bundle.putSerializable("lastCheckCodeData", codeData);
+
+			boolean isPass = logicChecker.checkin(codeData,cardBean);
+	
+			if(isPass) Database.getInstance(context).checkin(codeData.id);
 			
 			if(isPass){
 				cardBean.id = codeData.id;
@@ -82,18 +87,15 @@ public class NfcManager {
 				cardBean.lastTime = System.currentTimeMillis();
 			}
 
-			byte[] ret = cardBean.toBytes(data.length);
-			card.writeData(ret);
+			card.writeData(cardBean.toBytes(data.length));
+			
 			Message msg = new Message();
-			msg.what = 0;
+			msg.what = isPass?0:1;
 			msg.setData(bundle);
+			
 			if(handler!=null) handler.sendMessage(msg);
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (LogicException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+		} catch (IOException|LogicException e) {
+			if(handler!=null) handler.sendEmptyMessage(2);
 		}
 	}
 }

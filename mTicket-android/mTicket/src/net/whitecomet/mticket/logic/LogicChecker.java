@@ -53,7 +53,6 @@ public class LogicChecker {
 		String json = new Gson().toJson(codeData);
 		String json2 = new Gson().toJson(card);
 		boolean result = callScript(json,json2);
-		if(result) Database.getInstance(context).checkin(codeData.id);
 		return result;
 	}
 	

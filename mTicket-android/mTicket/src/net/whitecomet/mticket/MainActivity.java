@@ -4,6 +4,7 @@ import java.io.Serializable;
 import java.util.Random;
 
 import net.whitecomet.mticket.ConnectionService.ConnectionServiceBinder;
+import net.whitecomet.mticket.R.string;
 import net.whitecomet.mticket.data.Database;
 import net.whitecomet.mticket.data.TempStates;
 import net.whitecomet.mticket.data.beans.CheckinData;
@@ -347,18 +348,29 @@ public class MainActivity extends ActionBarActivity {
 				@Override
 				public void handleMessage(Message msg) {
 					super.handleMessage(msg);
-					
-					Bundle data = msg.getData();
-					
-					CodeDataReturn lastCheckCodeData = (CodeDataReturn) data.getSerializable("lastCheckCodeData");
-					String lastCheckCode = data.getString("checkCode");
-					CardBean card = (CardBean) data.getSerializable("cardBean");
-					if(lastCheckCode!=null) textLastCheckCode.setText(lastCheckCode);
-					if(lastCheckCodeData!=null){
-						textLastCheckCodeData.setText(card.toString()+lastCheckCodeData.toString());
-					}else{
-						textLastCheckCodeData.setText(getString(R.string.textview_checkCodeData_default));
+					switch (msg.what) {
+					case 0:
+					case 1:
+						Bundle data = msg.getData();
+						CodeDataReturn checkCodeData = (CodeDataReturn) data.getSerializable("lastCheckCodeData");
+						String lastCheckCode = data.getString("checkCode");
+						CardBean card = (CardBean) data.getSerializable("cardBean");
+						if(lastCheckCode!=null) textLastCheckCode.setText(lastCheckCode+(msg.what==0?"(通过)":"(未通过)"));
+						if(checkCodeData!=null){
+							textLastCheckCodeData.setText(card.toString()+checkCodeData.toString());
+						}else{
+							textLastCheckCodeData.setText(card.toString());
+						}
+						break;
+					case 2:
+						AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+						builder.setTitle(getString(R.string.AlertDialog_checkResult_title_failure));
+						builder.setNeutralButton(getString(R.string.close), null);
+						builder.setMessage(getString(R.string.AlertDialog_checkResult_content_3));
+						builder.show();
+						break;
 					}
+
 				}
 			});
 		}
