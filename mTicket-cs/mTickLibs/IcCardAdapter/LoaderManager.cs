@@ -37,7 +37,7 @@ namespace mTickLibs.IcCardAdapter
             AbstractIcCard icCard;
             switch (type)
             {
-                case 4:icCard = MifareOneIcCard.Get();break;
+                case 4: icCard = MifareOneIcCard.Get(_hdev); break;
                 case 68: icCard = MifareUltraLightIcCard.Get(_hdev); break;
                 default: icCard = DefaultIcCard.Get(); break;
             }
