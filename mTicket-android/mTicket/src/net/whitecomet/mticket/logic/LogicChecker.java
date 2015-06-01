@@ -17,6 +17,7 @@ public class LogicChecker {
 
 	private ScriptableObject scope;
 	private Function function;
+	private Function functionIc;
 	
     public LogicChecker(String js){
     	Context rhino = Context.enter();
@@ -27,14 +28,14 @@ public class LogicChecker {
 
         rhino.evaluateString(scope,js , "funtionCheckin", 0, null);
         function = rhino.compileFunction(scope, preCheckin, "preCheckin", 1, null);	
-		
+        functionIc = rhino.compileFunction(scope, preCheckinIc, "preCheckinIc", 1, null);	
+
         Context.exit();
 
     }
     
 	public boolean checkin(CodeDataReturn codeData) throws LogicException{
 		if(codeData==null) return false;
-		
 		String json = new Gson().toJson(codeData);
 		boolean result = callScript(json);
 		return result;
@@ -53,7 +54,6 @@ public class LogicChecker {
 	
 	public boolean checkin(CodeDataReturn codeData,CardBean card) throws LogicException{
 		if(codeData==null) return false;
-		
 		String json = new Gson().toJson(codeData);
 		String json2 = new Gson().toJson(card);
 		boolean result = callScript(json,json2);
@@ -62,17 +62,9 @@ public class LogicChecker {
 	
 	private boolean callScript(String json,String json2) throws LogicException{
 		try{
-			//TODO 预编译
 			Context rhino = Context.enter();
-	        rhino.setOptimizationLevel(-1);
-	        ScriptableObject scope = rhino.initStandardObjects();
-
-	        rhino.evaluateString(scope,TempStates.instance(context).severSettings.checkin_logic, "funtionCheckin", 0, null);
-	        Function function = rhino.compileFunction(scope, preCheckinIc, "preCheckinIc", 1, null);	
-			
-	        Object result = function.call(rhino, scope, scope,  new Object[]{json,json2,System.currentTimeMillis()});
+	        Object result = functionIc.call(rhino, scope, scope,  new Object[]{json,json2,System.currentTimeMillis()});
 	        Context.exit();
-          
 			return (boolean)result;
 		}catch(Exception e){
 	    	throw new LogicException(e);

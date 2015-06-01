@@ -47,7 +47,6 @@ public class NfcManager {
 		this.context = context.getApplicationContext();
 		mAdapter = NfcAdapter.getDefaultAdapter(this.context);
 		pendingIntent = PendingIntent.getActivity(this.context, 0, new Intent(this.context, MainActivity.class), 0);
-		logicChecker = new LogicChecker(context);
 	}
 
 	public void onPause(Activity activity){
@@ -58,7 +57,6 @@ public class NfcManager {
 		mAdapter.enableForegroundDispatch(activity, pendingIntent, intentFilters, techList);
 	}
 	
-	private LogicChecker logicChecker;
 	public void dealwithIntent(Intent intent, Handler handler){
 		Tag tag = intent.getParcelableExtra(NfcAdapter.EXTRA_TAG);
 		
@@ -77,7 +75,7 @@ public class NfcManager {
 			CodeDataReturn codeData = Database.getInstance(context).getCodeInfo(card.getIdHex());
 			bundle.putSerializable("lastCheckCodeData", codeData);
 
-			boolean isPass = logicChecker.checkin(codeData,cardBean);
+			boolean isPass = TempStates.instance(context).logicChecker.checkin(codeData,cardBean);
 	
 			if(isPass) Database.getInstance(context).checkin(codeData.id);
 			
