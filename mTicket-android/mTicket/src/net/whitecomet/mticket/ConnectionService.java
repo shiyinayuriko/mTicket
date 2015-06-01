@@ -124,7 +124,7 @@ public class ConnectionService extends Service {
     	    		try {
 						tcp.connect();
 						String json = tcp.call("connect");
-						TempStates.instance(ConnectionService.this).severSettings = new Gson().fromJson(json.trim(), SeverSettings.class);
+						TempStates.instance(ConnectionService.this).setSeverSettings(json);
 
 			    		TempStates.instance(ConnectionService.this).setHost(ipAddress, port);
 						myhandler.sendEmptyMessage(0);

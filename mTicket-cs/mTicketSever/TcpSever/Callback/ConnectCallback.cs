@@ -9,7 +9,7 @@ namespace mTicket
 {
     class ConnectCallback:ICallback
     {
-        private Form1 form1;
+        private Main form1;
 
         public ConnectCallback(TextBox text_log):base(text_log)
         {

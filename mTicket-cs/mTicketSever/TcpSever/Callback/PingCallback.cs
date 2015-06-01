@@ -9,7 +9,7 @@ namespace mTicket
 {
     class PingCallback:ICallback
     {
-        private Form1 form1;
+        private Main form1;
 
         public PingCallback(TextBox text_log):base(text_log)
         {

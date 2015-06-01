@@ -15,9 +15,21 @@ public class LogicChecker {
     private static final String preCheckin = "function pre(tmps) {var tmp = eval('(' + tmps + ')');return checkin(tmp);}";
     private static final String preCheckinIc = "function pre(tmps,tmps2,time) {var tmp = eval('(' + tmps + ')');var tmp2 = eval('(' + tmps2 + ')');return checkinIc(tmp,tmp2,time);}";
 
-    private android.content.Context context;
-    public LogicChecker(android.content.Context context){
-    	this.context = context.getApplicationContext();
+	private ScriptableObject scope;
+	private Function function;
+	
+    public LogicChecker(String js){
+    	Context rhino = Context.enter();
+        rhino.setOptimizationLevel(-1);
+        
+        rhino.setOptimizationLevel(-1);
+        scope = rhino.initStandardObjects();
+
+        rhino.evaluateString(scope,js , "funtionCheckin", 0, null);
+        function = rhino.compileFunction(scope, preCheckin, "preCheckin", 1, null);	
+		
+        Context.exit();
+
     }
     
 	public boolean checkin(CodeDataReturn codeData) throws LogicException{
@@ -30,17 +42,9 @@ public class LogicChecker {
 	
 	private boolean callScript(String json) throws LogicException{
 		try{
-			//TODO 预编译
 			Context rhino = Context.enter();
-	        rhino.setOptimizationLevel(-1);
-	        ScriptableObject scope = rhino.initStandardObjects();
-
-	        rhino.evaluateString(scope,TempStates.instance(context).severSettings.checkin_logic, "funtionCheckin", 0, null);
-	        Function function = rhino.compileFunction(scope, preCheckin, "preCheckin", 1, null);	
-			
 	        Object result = function.call(rhino, scope, scope,  new Object[]{json});
 	        Context.exit();
-          
 			return (boolean)result;
 		}catch(Exception e){
 	    	throw new LogicException(e);

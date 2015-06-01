@@ -168,7 +168,6 @@ public final class CaptureActivity extends Activity implements
 		ambientLightManager = new AmbientLightManager(this);
 		//TODO I modify here
 		bottom_detail = (TextView) findViewById(R.id.capture_bottom_detail);
-		logicChecker = new LogicChecker(this);
 	}
 
 	@Override
@@ -443,7 +442,6 @@ public final class CaptureActivity extends Activity implements
 		}
 	}
 
-	private LogicChecker logicChecker = null;  
 	private TextView bottom_detail;
 	
 	private CodeDataReturn lastCheckCodeData = null ; 
@@ -455,7 +453,7 @@ public final class CaptureActivity extends Activity implements
 			CodeDataReturn codeData = Database.getInstance(this).getCodeInfo(code);
 			lastCheckCodeData = codeData;
 			bottom_detail.setText(codeData==null?code:codeData.toString());
-			boolean isPass = logicChecker.checkin(codeData);
+			boolean isPass = TempStates.instance(this).logicChecker.checkin(codeData);
 			if(isPass){
 				Database.getInstance(this).checkin(codeData.id);
 				restartPreviewAfterDelay(TempStates.instance(this).severSettings.restart_scanner_delay);

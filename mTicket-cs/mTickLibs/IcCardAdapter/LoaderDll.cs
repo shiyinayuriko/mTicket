@@ -10,6 +10,8 @@ namespace mTickLibs.IcCardAdapter
     {
         public const Byte RequestModeIdle = 0;
         public const Byte RequestModeAll = 1;
+        public const Byte LoadKeyModeKeyA = 0;
+        public const Byte LoadKeyModeKeyB = 4;
 
         [DllImport("umf.DLL", EntryPoint = "fw_init")]
         public static extern Int32 fw_init(Int16 port, Int32 baud);
@@ -30,13 +32,13 @@ namespace mTickLibs.IcCardAdapter
         [DllImport("umf.DLL", EntryPoint = "fw_authentication")]
         public static extern Int32 fw_authentication(Int32 icdev, Byte _Mode, Byte _SecNr);
         [DllImport("umf.DLL", EntryPoint = "fw_read")]
-        public static extern Int32 fw_read(Int32 icdev, Byte _Adr, ref Byte _Data);
+        public static extern Int32 fw_read(Int32 icdev, Byte _Adr, Byte[] _Data);
 
         [DllImport("umf.dll", EntryPoint = "fw_read_hex")]
         public static extern Int16 fw_read_hex(Int32 icdev, Byte _Adr, StringBuilder _Data);
 
         [DllImport("umf.DLL", EntryPoint = "fw_write")]
-        public static extern Int32 fw_write(Int32 icdev, Byte _Adr, ref Byte _Data);
+        public static extern Int32 fw_write(Int32 icdev, Byte _Adr, Byte[] _Data);
 
         [DllImport("umf.dll", EntryPoint = "fw_write_hex")]
         public static extern Int16 fw_write_hex(Int32 icdev, Byte _Adr, string _Data);

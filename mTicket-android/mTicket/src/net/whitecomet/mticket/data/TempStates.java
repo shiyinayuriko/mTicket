@@ -6,6 +6,7 @@ import java.util.Date;
 import java.util.Locale;
 
 import net.whitecomet.mticket.data.beans.SeverSettings;
+import net.whitecomet.mticket.logic.LogicChecker;
 
 import com.google.gson.Gson;
 
@@ -76,9 +77,11 @@ public class TempStates {
 	}
 	
 	public SeverSettings severSettings = null;
+	public LogicChecker logicChecker = null;
 	public void setSeverSettings(String settings){
 		Gson gson = new Gson();
-		severSettings = gson.fromJson(settings, SeverSettings.class);
+		severSettings = gson.fromJson(settings.trim(), SeverSettings.class);
+		logicChecker = new LogicChecker(severSettings.checkin_logic);
 	}
 	
 	private String deviceName = null;
