@@ -5,7 +5,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
-public class CodeDataReturn implements Serializable{
+public class CodeDataDetail implements Serializable{
 	private static final long serialVersionUID = 2898986580341574916L;
 	public Map<String,String> info;
 	public List<CheckinData> checkin;

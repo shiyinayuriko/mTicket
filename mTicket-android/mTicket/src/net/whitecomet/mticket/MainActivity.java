@@ -7,7 +7,7 @@ import net.whitecomet.mticket.ConnectionService.ConnectionServiceBinder;
 import net.whitecomet.mticket.data.Database;
 import net.whitecomet.mticket.data.TempStates;
 import net.whitecomet.mticket.data.beans.CheckinData;
-import net.whitecomet.mticket.data.beans.CodeDataReturn;
+import net.whitecomet.mticket.data.beans.CodeDataDetail;
 import net.whitecomet.mticket.scanner.CaptureActivity;
 import android.support.v7.app.ActionBarActivity;
 import android.app.AlertDialog;
@@ -287,7 +287,7 @@ public class MainActivity extends ActionBarActivity {
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 		if(data==null) return;
 		
-		CodeDataReturn lastCheckCodeData = (CodeDataReturn) data.getSerializableExtra("lastCheckCodeData");
+		CodeDataDetail lastCheckCodeData = (CodeDataDetail) data.getSerializableExtra("lastCheckCodeData");
 		String lastCheckCode = data.getStringExtra("lastCheckCode");
 		if(lastCheckCode!=null) textLastCheckCode.setText(lastCheckCode);
 		if(lastCheckCodeData!=null){

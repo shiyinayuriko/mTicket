@@ -28,7 +28,7 @@ import net.whitecomet.mticket.R;
 import net.whitecomet.mticket.data.Database;
 import net.whitecomet.mticket.data.TempStates;
 import net.whitecomet.mticket.data.beans.CheckinData;
-import net.whitecomet.mticket.data.beans.CodeDataReturn;
+import net.whitecomet.mticket.data.beans.CodeDataDetail;
 import net.whitecomet.mticket.logic.LogicChecker;
 import net.whitecomet.mticket.logic.LogicException;
 import net.whitecomet.mticket.scanner.camera.CameraManager;
@@ -444,13 +444,13 @@ public final class CaptureActivity extends Activity implements
 
 	private TextView bottom_detail;
 	
-	private CodeDataReturn lastCheckCodeData = null ; 
+	private CodeDataDetail lastCheckCodeData = null ; 
 	private String lastCheckCode = null;
 	private void checkin(String code){
 		lastCheckCode = code;
 		
 		try {
-			CodeDataReturn codeData = Database.getInstance(this).getCodeInfo(code);
+			CodeDataDetail codeData = Database.getInstance(this).getCodeInfo(code);
 			lastCheckCodeData = codeData;
 			bottom_detail.setText(codeData==null?code:codeData.toString());
 			boolean isPass = TempStates.instance(this).logicChecker.checkin(codeData);

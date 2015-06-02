@@ -6,7 +6,7 @@ import org.mozilla.javascript.ScriptableObject;
 
 import net.whitecomet.mticket.data.Database;
 import net.whitecomet.mticket.data.TempStates;
-import net.whitecomet.mticket.data.beans.CodeDataReturn;
+import net.whitecomet.mticket.data.beans.CodeDataDetail;
 
 import com.google.gson.Gson;
 
@@ -30,7 +30,7 @@ public class LogicChecker {
 
     }
     
-	public boolean checkin(CodeDataReturn codeData) throws LogicException{
+	public boolean checkin(CodeDataDetail codeData) throws LogicException{
 		if(codeData==null) return false;
 		
 		String json = new Gson().toJson(codeData);

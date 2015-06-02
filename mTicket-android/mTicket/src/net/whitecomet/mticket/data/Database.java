@@ -3,7 +3,7 @@ package net.whitecomet.mticket.data;
 import java.util.ArrayList;
 import java.util.HashMap;
 import net.whitecomet.mticket.data.beans.CheckinData;
-import net.whitecomet.mticket.data.beans.CodeDataReturn;
+import net.whitecomet.mticket.data.beans.CodeDataDetail;
 import net.whitecomet.mticket.data.beans.CodeInfo;
 import net.whitecomet.mticket.data.beans.CodeTable;
 import android.content.ContentValues;
@@ -160,7 +160,7 @@ public class Database extends SQLiteOpenHelper {
 	}
 
 	private String[] columns = null;
-	public CodeDataReturn getCodeInfo(String code){
+	public CodeDataDetail getCodeInfo(String code){
 		if(columns == null){
 			Cursor c = db.query(codeInfoColumnTableName,null,null,null,null,null,null);
 			String[] columnsTmp = new String[c.getCount()];
@@ -173,7 +173,7 @@ public class Database extends SQLiteOpenHelper {
 
 		Cursor ci = db.query(codeTableName,null,"code=?",new String[]{code},null,null,null,1+"");
 		if(ci.moveToFirst()){
-			CodeDataReturn ret = new CodeDataReturn();
+			CodeDataDetail ret = new CodeDataDetail();
 			ret.id = ci.getInt(ci.getColumnIndex("id"));
 			ret.code = ci.getString(ci.getColumnIndex("code"));
 			ci.close();
